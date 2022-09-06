@@ -1,6 +1,6 @@
 package org.littlered.dataservices.repository.eventManager.interfaces;
 
-import org.littlered.dataservices.entity.eventManager.pub.EmBookings;
+import org.littlered.dataservices.entity.eventManager.EmBookings;
 import org.littlered.dataservices.entity.wordpress.BbcBookingCountView;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -13,12 +13,12 @@ import java.util.List;
  * Created by Jeremy on 3/25/2017.
  */
 @Repository
-public interface BookingsRepositoryInterface extends PagingAndSortingRepository<org.littlered.dataservices.entity.eventManager.EmBookings, Long> {
+public interface BookingsRepositoryInterface extends PagingAndSortingRepository<EmBookings, Long> {
 
 	@Query(value = "SELECT b from EmBookings b where b.user.id = ?1 AND b.eventId.eventName not like 'Verify % badge%' " +
 			"AND FUNCTION('YEAR', b.eventId.eventStartDate) = ?2 " +
 			"AND b.bookingStatus = org.littlered.dataservices.Constants.STATUS_CODE_BOOKED")
-	List<org.littlered.dataservices.entity.eventManager.EmBookings> findForUser(Long userId, Integer filterYear);
+	List<EmBookings> findForUser(Long userId, Integer filterYear);
 
 	@Query(value = "SELECT b from EmBookings b where b.user.id = ?1 AND b.eventId.eventName not like 'Verify % badge%' " +
 			"AND FUNCTION('YEAR', b.eventId.eventStartDate) = ?2 " +
@@ -28,44 +28,44 @@ public interface BookingsRepositoryInterface extends PagingAndSortingRepository<
 	@Query(value = "SELECT b from EmBookings b where b.eventId.eventId= ?1 and b.bookingSpaces = 1 " +
 			"AND FUNCTION('YEAR', b.eventId.eventStartDate) = ?2 " +
 			"AND b.bookingStatus  = org.littlered.dataservices.Constants.STATUS_CODE_BOOKED")
-	List<org.littlered.dataservices.entity.eventManager.EmBookings> findForEvent(Long eventId, Integer filterYear);
+	List<EmBookings> findForEvent(Long eventId, Integer filterYear);
 
 	@Query(value = "SELECT b from EmBookings b where b.eventId.eventId= ?1 and b.bookingSpaces = 1 " +
 			"AND FUNCTION('YEAR', b.eventId.eventStartDate) = ?2 " +
 			"AND b.bookingStatus = org.littlered.dataservices.Constants.STATUS_CODE_OVERBOOKED")
-	List<org.littlered.dataservices.entity.eventManager.EmBookings> findOverbookingForEvent(Long eventId, Integer filterYear);
+	List<EmBookings> findOverbookingForEvent(Long eventId, Integer filterYear);
 
 	@Query(value = "SELECT b from EmBookings b where b.user.id = ?1 AND b.eventId.eventId = ?2 " +
 			"AND FUNCTION('YEAR', b.eventId.eventStartDate) = ?3 " +
 			"and b.bookingStatus = org.littlered.dataservices.Constants.STATUS_CODE_OVERBOOKED")
-	List<org.littlered.dataservices.entity.eventManager.EmBookings> findOverbookingForUserAndEvent(Long userId, Long eventId, Integer filterYear);
+	List<EmBookings> findOverbookingForUserAndEvent(Long userId, Long eventId, Integer filterYear);
 
 	@Query(value = "SELECT bcv from BbcBookingCountView bcv where FUNCTION('YEAR', bcv.eventStartDate) = ?2 " +
 			"AND bcv.personId = ?1 and bcv.bookingSpaces = 1")
 	List<BbcBookingCountView> findBookingsForQuotaCount(Long userId, Integer filterYear);
 
 	@Query(value = "SELECT b from EmBookings b where b.eventId.eventId = ?1 AND b.user.id = ?2 and b.bookingSpaces = 1")
-	List<org.littlered.dataservices.entity.eventManager.EmBookings> findBookingsByEventIdandUserId(Long eventId, Long userId);
+	List<EmBookings> findBookingsByEventIdandUserId(Long eventId, Long userId);
 
 	@Query(value =
 			"SELECT b FROM EmBookings b " +
 					"WHERE FUNCTION('TIMESTAMP', b.eventId.eventStartDate, b.eventId.eventStartTime) <= ?2 " +
 					"  AND FUNCTION('TIMESTAMP', b.eventId.eventEndDate, b.eventId.eventEndTime) > ?2 " +
 					"  AND b.user.id = ?1 and b.bookingStatus = 1")
-	List<org.littlered.dataservices.entity.eventManager.EmBookings> findConflictingEventsForUserAndStartDateTime(Long userId, Date startDate);
+	List<EmBookings> findConflictingEventsForUserAndStartDateTime(Long userId, Date startDate);
 
 	@Query(value =
 			"SELECT b FROM EmBookings b " +
 					"WHERE FUNCTION('TIMESTAMP', b.eventId.eventStartDate, b.eventId.eventStartTime) < ?2 " +
 					"  AND FUNCTION('TIMESTAMP', b.eventId.eventEndDate, b.eventId.eventEndTime) >= ?2 " +
 					"  AND b.user.id = ?1 and b.bookingStatus = 1")
-	List<org.littlered.dataservices.entity.eventManager.EmBookings> findConflictingEventsForUserAndEndDateTime(Long userId, Date endDate);
+	List<EmBookings> findConflictingEventsForUserAndEndDateTime(Long userId, Date endDate);
 
 	@Query(value =
 			"SELECT b FROM EmBookings b " +
 					"WHERE FUNCTION('TIMESTAMP', b.eventId.eventStartDate, b.eventId.eventStartTime) >= ?2 " +
 					"  AND FUNCTION('TIMESTAMP', b.eventId.eventEndDate, b.eventId.eventEndTime) <= ?3 " +
 					"  AND b.user.id = ?1 and b.bookingStatus = 1")
-	List<org.littlered.dataservices.entity.eventManager.EmBookings> findNestedConflictingEventsUserAndStartAndEnd(Long userId, Date startDate, Date endDate);
+	List<EmBookings> findNestedConflictingEventsUserAndStartAndEnd(Long userId, Date startDate, Date endDate);
 
 }

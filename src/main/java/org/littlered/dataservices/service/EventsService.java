@@ -1,7 +1,6 @@
 package org.littlered.dataservices.service;
 
 import org.littlered.dataservices.Constants;
-import org.littlered.dataservices.entity.eventManager.pub.EmBookings;
 import org.littlered.dataservices.entity.eventManager.pub.EmEvents;
 import org.littlered.dataservices.entity.wordpress.BbcUserFavorites;
 import org.littlered.dataservices.exception.FavoritingException;
@@ -124,7 +123,7 @@ public class EventsService {
 			year = yearLong.toString();
 		}
 		ArrayList<Long> events = new ArrayList<>();
-		for (EmBookings booking : bookingsRepository.findPublicForUser(usersService.getCurrentUser().getId(), Integer.parseInt(year))) {
+		for (org.littlered.dataservices.entity.eventManager.EmBookings booking : bookingsRepository.findPublicForUser(usersService.getCurrentUser().getId(), Integer.parseInt(year))) {
 			events.add(booking.getEventId().getEventId());
 		}
 		return events;
