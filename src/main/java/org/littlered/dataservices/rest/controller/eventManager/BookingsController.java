@@ -106,7 +106,7 @@ public class BookingsController {
 		Long userId = usersService.getCurrentUser().getId();
 
 		try {
-			bookingsService.removePlayerFromGame(userId, gameBooking.getGameId(), UUID.randomUUID().toString(), false);
+			bookingsService.removePlayerFromGame(userId, gameBooking.getGameId(), UUID.randomUUID().toString(), true);
 			reply.setStatus(Constants.STATUS_SUCCESS);
 		}
 		catch (SecurityException e) {
@@ -172,7 +172,7 @@ public class BookingsController {
 		if(eventBookingData != null)
 			logger.info(eventBookingData.toString());
 		try {
-			bookingsService.removePlayerFromGame(eventBookingData.getUserId(), eventBookingData.getEventId(), UUID.randomUUID().toString(), true);
+			bookingsService.removePlayerFromGame(eventBookingData.getUserId(), eventBookingData.getEventId(), UUID.randomUUID().toString(), false);
 			eventBookingData.setStatus(Constants.STATUS_SUCCESS);
 		}
 		catch (SecurityException e) {
