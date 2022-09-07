@@ -111,6 +111,7 @@ public class BookingsController {
 		}
 		catch (SecurityException e) {
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			reply.setMessage(e.getLocalizedMessage());
 			reply.setStatus(Constants.STATUS_FAILURE);
 		}
 		catch (Exception e) {
@@ -176,6 +177,7 @@ public class BookingsController {
 		}
 		catch (SecurityException e) {
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			eventBookingData.setMessage(e.getLocalizedMessage());
 			eventBookingData.setStatus(Constants.STATUS_FAILURE);
 		}
 		catch (Exception e) {
