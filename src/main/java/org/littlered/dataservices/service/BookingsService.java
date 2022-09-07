@@ -355,8 +355,10 @@ public class BookingsService {
 	 * @throws Exception if the user is not currently booked in the game.
 	 */
 	//@Transactional
-	public void removePlayerFromGame(Long userId, Long eventId, String uuid)  throws Exception {
-		securityService.checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
+	public void removePlayerFromGame(Long userId, Long eventId, String uuid, boolean isMe)  throws Exception {
+		if (!isMe) {
+			securityService.checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
+		}
 		logger.info("Removing booking for request ID " + uuid);
 		List<EmTicketsBookings> ticketsBookings = checkIfUserIsInGame(userId, eventId);
 		if(ticketsBookings.size() == 0) {
