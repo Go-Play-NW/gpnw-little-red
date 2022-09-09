@@ -347,14 +347,6 @@ public class EventsJPAService {
 				postmeta.setMetaValue("");
 				postMetaJPAService.save(postmeta);
 
-			/*
-			postmeta = new Postmeta();
-			postmeta.setPostId(post.getId());
-			postmeta.setMetaKey("game_image");
-			postmeta.setMetaValue("");
-			postMetaJPAService.save(postmeta);
-			*/
-
 				// WP/EM bookeeping from here on
 				postmeta = new Postmeta();
 				postmeta.setPostId(post.getId());
@@ -365,13 +357,13 @@ public class EventsJPAService {
 				postmeta = new Postmeta();
 				postmeta.setPostId(post.getId());
 				postmeta.setMetaKey("_event_start_time");
-				postmeta.setMetaValue(defaultEventStartTime);
+				postmeta.setMetaValue(timeFormat.format(startDateTime));
 				postMetaJPAService.save(postmeta);
 
 				postmeta = new Postmeta();
 				postmeta.setPostId(post.getId());
 				postmeta.setMetaKey("_event_end_time");
-				postmeta.setMetaValue(defaultEventEndTime);
+				postmeta.setMetaValue(timeFormat.format(endDateTime));
 				postMetaJPAService.save(postmeta);
 
 				postmeta = new Postmeta();
@@ -383,13 +375,13 @@ public class EventsJPAService {
 				postmeta = new Postmeta();
 				postmeta.setPostId(post.getId());
 				postmeta.setMetaKey("_event_start_date");
-				postmeta.setMetaValue(defaultEventStartDate);
+				postmeta.setMetaValue(dateFormat.format(startDateTime));
 				postMetaJPAService.save(postmeta);
 
 				postmeta = new Postmeta();
 				postmeta.setPostId(post.getId());
 				postmeta.setMetaKey("_event_end_date");
-				postmeta.setMetaValue(defaultEventEndDate);
+				postmeta.setMetaValue(dateFormat.format(endDateTime));
 				postMetaJPAService.save(postmeta);
 
 				postmeta = new Postmeta();
@@ -503,13 +495,13 @@ public class EventsJPAService {
 				postmeta = new Postmeta();
 				postmeta.setPostId(post.getId());
 				postmeta.setMetaKey("_start_ts");
-				postmeta.setMetaValue(String.valueOf(startDate.getTime()));
+				postmeta.setMetaValue(String.valueOf(startDateTime.getTime()));
 				postMetaJPAService.save(postmeta);
 
 				postmeta = new Postmeta();
 				postmeta.setPostId(post.getId());
 				postmeta.setMetaKey("_end_ts");
-				postmeta.setMetaValue(String.valueOf(endDate.getTime()));
+				postmeta.setMetaValue(String.valueOf(endDateTime.getTime()));
 				postMetaJPAService.save(postmeta);
 
 				postmeta = new Postmeta();
@@ -521,15 +513,13 @@ public class EventsJPAService {
 				postmeta = new Postmeta();
 				postmeta.setPostId(post.getId());
 				postmeta.setMetaKey("_event_start");
-				postmeta.setMetaValue(defaultEventStartDate.concat(" ")
-						.concat(defaultEventStartTime));
+				postmeta.setMetaValue(dateTimeFormat.format(startDateTime));
 				postMetaJPAService.save(postmeta);
 
 				postmeta = new Postmeta();
 				postmeta.setPostId(post.getId());
 				postmeta.setMetaKey("_event_end");
-				postmeta.setMetaValue(defaultEventEndDate.concat(" ")
-						.concat(defaultEventEndTime));
+				postmeta.setMetaValue(dateTimeFormat.format(endDateTime));
 				postMetaJPAService.save(postmeta);
 
 				postmeta = new Postmeta();
@@ -541,15 +531,13 @@ public class EventsJPAService {
 				postmeta = new Postmeta();
 				postmeta.setPostId(post.getId());
 				postmeta.setMetaKey("_event_start_local");
-				postmeta.setMetaValue(defaultEventStartDate.concat(" ")
-						.concat(defaultEventStartTime));
+				postmeta.setMetaValue(dateTimeFormat.format(startDateTime));
 				postMetaJPAService.save(postmeta);
 
 				postmeta = new Postmeta();
 				postmeta.setPostId(post.getId());
 				postmeta.setMetaKey("_event_end_local");
-				postmeta.setMetaValue(defaultEventEndDate.concat(" ")
-						.concat(defaultEventEndTime));
+				postmeta.setMetaValue(dateTimeFormat.format(endDateTime));
 				postMetaJPAService.save(postmeta);
 
 				postmeta = new Postmeta();
