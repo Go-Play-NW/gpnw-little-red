@@ -17,7 +17,7 @@ public class BbcBookingCountView implements Serializable {
 	private Integer bookingSpaces;
 	private String bookingComment;
 	private Timestamp bookingDate;
-	private Byte bookingStatus;
+	private Integer bookingStatus;
 	private BigDecimal bookingPrice;
 	private String bookingMeta;
 	private BigDecimal bookingTaxRate;
@@ -90,11 +90,11 @@ public class BbcBookingCountView implements Serializable {
 
 	@Basic
 	@Column(name = "booking_status")
-	public Byte getBookingStatus() {
+	public Integer getBookingStatus() {
 		return bookingStatus;
 	}
 
-	public void setBookingStatus(Byte bookingStatus) {
+	public void setBookingStatus(Integer bookingStatus) {
 		this.bookingStatus = bookingStatus;
 	}
 

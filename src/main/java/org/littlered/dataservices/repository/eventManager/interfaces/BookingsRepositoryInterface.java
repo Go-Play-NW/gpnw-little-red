@@ -16,12 +16,12 @@ import java.util.List;
 public interface BookingsRepositoryInterface extends PagingAndSortingRepository<EmBookings, Long> {
 
 	@Query(value = "SELECT b from org.littlered.dataservices.entity.eventManager.EmBookings b where b.user.id = ?1 AND b.eventId.eventName not like 'Verify % badge%' " +
-			"AND FUNCTION('YEAR', b.eventId.eventStartDate) = ?2 and b.eventId.event_status = 1 " +
+			"AND FUNCTION('YEAR', b.eventId.eventStartDate) = ?2 and b.eventId.eventStatus = 1 " +
 			"AND b.bookingStatus = org.littlered.dataservices.Constants.STATUS_CODE_BOOKED")
 	List<EmBookings> findForUser(Long userId, Integer filterYear);
 
 	@Query(value = "SELECT b from org.littlered.dataservices.entity.eventManager.EmBookings b where b.user.id = ?1 AND b.eventId.eventName not like 'Verify % badge%' " +
-			"AND FUNCTION('YEAR', b.eventId.eventStartDate) = ?2 and b.eventId.event_status = 1 " +
+			"AND FUNCTION('YEAR', b.eventId.eventStartDate) = ?2 and b.eventId.eventStatus = 1 " +
 			"AND b.bookingStatus = org.littlered.dataservices.Constants.STATUS_CODE_BOOKED")
 	List<EmBookings> findPublicForUser(Long userId, Integer filterYear);
 
