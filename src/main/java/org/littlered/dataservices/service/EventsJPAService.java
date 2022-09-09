@@ -91,7 +91,7 @@ public class EventsJPAService {
 		// TODO evaluate use of this field
 		String defaultEventRsvpDate = yearFilter.concat("-").concat(defaultEventDate);
 
-		String defaultEventTimeFormat = "hh:mm:ss";
+		String defaultEventTimeFormat = "HH:mm:ss";
 		String defaultEventStartTime = defaultEventTime;
 		String defaultEventEndTime = defaultEventTime;
 		// TODO evaluate use of this field
