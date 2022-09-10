@@ -261,7 +261,7 @@ public class EventsController {
 
 	@ApiOperation(value = "Upload an image file for an event.", response = Boolean.class)
 	@RequestMapping(value = "/image", method = RequestMethod.POST, produces = "application/json")
-	public UploadFileResponse uploadFile(@RequestPart("file") MultipartFile file, @RequestPart("eventId") String eventId, HttpServletResponse response) {
+	public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("eventId") String eventId, HttpServletResponse response) {
 		String fileName;
 		try {
 			fileName = fileStorageService.storeFile(file, eventId);
