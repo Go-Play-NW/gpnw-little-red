@@ -50,11 +50,27 @@ public class UsersJPAService {
 
 		List<Users> loginCheck = usersRepository.findUsersByUserLogin(userIn.getUserLogin());
 		if (loginCheck != null && loginCheck.size() > 0) {
+			HashMap<String, String> badLogiMail = new HashMap<>();
+			badLogiMail.put("subject", "Account Creation Failed at Go Play NW");
+			badLogiMail.put("body", "Someone just tried to create a user account at Go Play NW with the user name associated with this email address." +
+					"If that was you, great! That means your account already exists there! Please try to log in with those credentials." +
+					"If that wasn't you, you don't need to do anything. We have protected your account!");
+			badLogiMail.put("to", loginCheck.get(0).getUserEmail());
+			emailService.sendEmail(badLogiMail);
+			logger.info("Sent email for created account to " + loginCheck.get(0).getUserEmail());
 			throw new UniqueUserException("That login is invalid.");
 		}
 
 		List<Users> emailCheck = usersRepository.findUsersByUserEmail(userIn.getUserEmail());
 		if (emailCheck != null && emailCheck.size() > 0) {
+			HashMap<String, String> badEmailMail = new HashMap<>();
+			badEmailMail.put("subject", "Account Creation Failed at Go Play NW");
+			badEmailMail.put("body", "Someone just tried to create a user account at Go Play NW with this email address." +
+					"If that was you, great! That means your account already exists there! Please try to log in with those credentials." +
+					"If that wasn't you, you don't need to do anything. We have protected your account!");
+			badEmailMail.put("to", loginCheck.get(0).getUserEmail());
+			emailService.sendEmail(badEmailMail);
+			logger.info("Sent email for created account to " + loginCheck.get(0).getUserEmail());
 			throw new UniqueUserException("That email address is invalid.");
 		}
 
@@ -98,11 +114,11 @@ public class UsersJPAService {
 		logger.info("Created account for " + userIn.getUserLogin());
 
 		try {
-			HashMap<String, String> resetEmail = new HashMap<>();
-			resetEmail.put("subject", userIn.getEmailSubject());
-			resetEmail.put("body", userIn.getEmailBody());
-			resetEmail.put("to", userIn.getUserEmail());
-			emailService.sendEmail(resetEmail);
+			HashMap<String, String> newUserMail = new HashMap<>();
+			newUserMail.put("subject", userIn.getEmailSubject());
+			newUserMail.put("body", userIn.getEmailBody());
+			newUserMail.put("to", userIn.getUserEmail());
+			emailService.sendEmail(newUserMail);
 			logger.info("Sent email for created account to " + userIn.getUserLogin());
 		} catch (Exception e) {
 			logger.severe("Error sending email for password reset for " + userIn.getUserEmail() + "!");
