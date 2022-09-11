@@ -22,9 +22,6 @@ import java.util.HashMap;
 public class EmailService {
 
 	@Autowired
-	private JavaMailSender javaMailSender;
-
-	@Autowired
 	private AwsSesService awsSesService;
 
 	@Value("${email.useSes}")

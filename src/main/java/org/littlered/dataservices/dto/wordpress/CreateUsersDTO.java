@@ -16,6 +16,8 @@ public class CreateUsersDTO implements Serializable {
 	private String firstName;
 	private String lastName;
 	private String nickname;
+	private String emailSubject;
+	private String emailBody;
 
 	public String getUserLogin() {
 		return userLogin;
@@ -87,5 +89,21 @@ public class CreateUsersDTO implements Serializable {
 
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
+	}
+
+	public String getEmailSubject() {
+		return emailSubject;
+	}
+
+	public void setEmailSubject(String emailSubject) {
+		this.emailSubject = emailSubject;
+	}
+
+	public String getEmailBody() {
+		return emailBody;
+	}
+
+	public void setEmailBody(String emailBody) {
+		this.emailBody = emailBody;
 	}
 }

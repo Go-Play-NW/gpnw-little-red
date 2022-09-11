@@ -157,22 +157,4 @@ public class UsersController {
 		}
 	}
 
-	@RequestMapping(value = "/resetPasswordRequest", method = RequestMethod.POST)
-	public void resetPasswordRequest(@RequestBody PasswordResetRequest request, HttpServletResponse response) {
-		try {
-			usersJPAService.requestPasswordReset(request.getEmail());
-		} catch (Exception e) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-		}
-	}
-
-	@RequestMapping(value = "/confirmPasswordRequest", method = RequestMethod.POST)
-	public void confirmPasswordRequest(@RequestBody ConfirmPasswordRequest request, HttpServletResponse response) {
-		try {
-			usersJPAService.confirmPasswordRequest(request.getToken(), request.getPassword());
-		} catch (Exception e) {
-			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-		}
-	}
-
 }

@@ -1,6 +1,5 @@
 package org.littlered.dataservices.service;
 
-import org.littlered.dataservices.Constants;
 import org.littlered.dataservices.dto.wordpress.CreateUsersDTO;
 import org.littlered.dataservices.entity.wordpress.Usermeta;
 import org.littlered.dataservices.entity.wordpress.Users;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.logging.Logger;
@@ -38,19 +38,10 @@ public class UsersJPAService {
 	@Autowired
 	private EmailService emailService;
 
-	@Autowired
-	private SecurityService securityService;
-
 	@Value("${db.table_prefix}")
 	private String tablePrefix;
 
-	@Value("${site.name}")
-	private String siteName;
-
-	@Value("${site.baseUri}")
-	private String siteBaseUri;
-
-	private Logger logger = Logger.getLogger(this.getClass().getName());
+	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
 	@Transactional
 	public void create(CreateUsersDTO userIn) throws Exception {
@@ -58,12 +49,12 @@ public class UsersJPAService {
 		Date now = Calendar.getInstance().getTime();
 
 		List<Users> loginCheck = usersRepository.findUsersByUserLogin(userIn.getUserLogin());
-		if (loginCheck == null || loginCheck.size() > 0) {
+		if (loginCheck != null && loginCheck.size() > 0) {
 			throw new UniqueUserException("That login is invalid.");
 		}
 
 		List<Users> emailCheck = usersRepository.findUsersByUserEmail(userIn.getUserEmail());
-		if (emailCheck == null || emailCheck.size() > 0) {
+		if (emailCheck != null && emailCheck.size() > 0) {
 			throw new UniqueUserException("That email address is invalid.");
 		}
 
@@ -104,54 +95,22 @@ public class UsersJPAService {
 		usermeta.setMetaValue("a:1:{s:12:\"notattending\";b:1;}");
 		usermetaJPAInterface.save(usermeta);
 
-	}
+		logger.info("Created account for " + userIn.getUserLogin());
 
-	@Transactional
-	public void requestPasswordReset(String pEmailAddress) throws Exception {
-
-		List<Users> emailCheck = usersRepository.findUsersByUserEmail(pEmailAddress);
-		if (emailCheck == null || emailCheck.size() < 0) {
-			throw new UniqueUserException("That email address is invalid.");
+		try {
+			HashMap<String, String> resetEmail = new HashMap<>();
+			resetEmail.put("subject", userIn.getEmailSubject());
+			resetEmail.put("body", userIn.getEmailBody());
+			resetEmail.put("to", userIn.getUserEmail());
+			emailService.sendEmail(resetEmail);
+			logger.info("Sent email for created account to " + userIn.getUserLogin());
+		} catch (Exception e) {
+			logger.severe("Error sending email for password reset for " + userIn.getUserEmail() + "!");
+			e.printStackTrace();
 		}
 
-		if (emailCheck.size() > 1) {
-			throw new UniqueUserException("Multiple matching emails found.");
-		}
-
-		Users ourHero = emailCheck.get(0);
-
-		String uuid = UUID.randomUUID().toString();
-		String token = generatePasswordToken(uuid);
-		ourHero.setUserActivationKey(uuid);
-		usersRepository.save(ourHero);
-
-		HashMap<String, String> message = new HashMap<>();
-		message.put("subject", siteName.concat(" password reset request"));
-		message.put("to", ourHero.getUserEmail());
-		message.put("body", siteBaseUri.concat("/reset/?".concat(token)));
-		emailService.sendEmail(message);
-
 	}
 
-	@Transactional
-	public void confirmPasswordRequest(String token, String password) throws Exception {
-
-		securityService.checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
-
-		List<Users> tokenCheck = usersRepository.findUsersByUserActivationKey(Arrays.toString(Base64.getDecoder().decode(token)));
-		if (tokenCheck == null || tokenCheck.size() > 0) {
-			throw new Exception("That token is is invalid.");
-		}
-
-		Users ourHero = tokenCheck.get(0);
-		ourHero.setUserPass(new PhpPasswordEncoder().encode(password));
-		usersRepository.save(ourHero);
-
-	}
-
-	private String generatePasswordToken(String uuid) {
-		return Base64.getEncoder().encodeToString(uuid.getBytes());
-	}
 
 	public List<String> addUserRole(Long pUserId, String pNewRole) throws Exception {
 
@@ -183,7 +142,7 @@ public class UsersJPAService {
 
 		Serializer serializer = new SerializerBuilder()
 				.registerBuiltinAdapters()
-				.setCharset(Charset.forName("ISO-8859-1"))
+				.setCharset(StandardCharsets.ISO_8859_1)
 				.build();
 		capabilities.setMetaValue(serializer.serialize(newCaps));
 
