@@ -52,8 +52,8 @@ public class UsersJPAService {
 		if (loginCheck != null && loginCheck.size() > 0) {
 			HashMap<String, String> badLogiMail = new HashMap<>();
 			badLogiMail.put("subject", "Account Creation Failed at Go Play NW");
-			badLogiMail.put("body", "Someone just tried to create a user account at Go Play NW with the user name associated with this email address." +
-					"If that was you, great! That means your account already exists there! Please try to log in with those credentials." +
+			badLogiMail.put("body", "Someone just tried to create a user account at Go Play NW with the user name associated with this email address. " +
+					"If that was you, great! That means your account already exists there! Please try to log in with those credentials. " +
 					"If that wasn't you, you don't need to do anything. We have protected your account!");
 			badLogiMail.put("to", loginCheck.get(0).getUserEmail());
 			emailService.sendEmail(badLogiMail);
@@ -65,12 +65,12 @@ public class UsersJPAService {
 		if (emailCheck != null && emailCheck.size() > 0) {
 			HashMap<String, String> badEmailMail = new HashMap<>();
 			badEmailMail.put("subject", "Account Creation Failed at Go Play NW");
-			badEmailMail.put("body", "Someone just tried to create a user account at Go Play NW with this email address." +
-					"If that was you, great! That means your account already exists there! Please try to log in with those credentials." +
+			badEmailMail.put("body", "Someone just tried to create a user account at Go Play NW with this email address. " +
+					"If that was you, great! That means your account already exists there! Please try to log in with those credentials. " +
 					"If that wasn't you, you don't need to do anything. We have protected your account!");
-			badEmailMail.put("to", loginCheck.get(0).getUserEmail());
+			badEmailMail.put("to", emailCheck.get(0).getUserEmail());
 			emailService.sendEmail(badEmailMail);
-			logger.info("Sent email for created account to " + loginCheck.get(0).getUserEmail());
+			logger.info("Sent email for created account to " + emailCheck.get(0).getUserEmail());
 			throw new UniqueUserException("That email address is invalid.");
 		}
 
