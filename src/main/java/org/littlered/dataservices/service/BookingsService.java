@@ -1,7 +1,6 @@
 package org.littlered.dataservices.service;
 
 import org.littlered.dataservices.Constants;
-import org.littlered.dataservices.entity.eventManager.*;
 import org.littlered.dataservices.entity.wordpress.*;
 import org.littlered.dataservices.entity.eventManager.EmBookings;
 import org.littlered.dataservices.entity.eventManager.EmEvents;
@@ -12,11 +11,9 @@ import org.littlered.dataservices.entity.wordpress.Postmeta;
 import org.littlered.dataservices.entity.wordpress.shrt.BbcEventCategories;
 import org.littlered.dataservices.entity.wordpress.shrt.BbcUsersShort;
 import org.littlered.dataservices.repository.eventManager.interfaces.*;
+import org.littlered.dataservices.repository.wordpress.interfaces.PostMetaJPAInterface;
 import org.littlered.dataservices.repository.wordpress.interfaces.UsersRepositoryInterface;
 import org.littlered.dataservices.repository.wordpress.interfaces.UsersShortRepositoryInterface;
-import org.littlered.dataservices.repository.eventManager.interfaces.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -28,6 +25,8 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by Jeremy on 4/2/2017.
@@ -67,13 +66,16 @@ public class BookingsService {
 	@Autowired
 	private SecurityService securityService;
 
+	@Autowired
+	private PostMetaJPAInterface postMetaJPAInterface;
+
 	@Value("${display.year.filter}")
 	private String yearFilter;
 
 	@Value("${bookings.quota}")
 	private String quota;
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private static final String pendingPlayerSubject = "dbem_bookings_email_pending_subject";
 	private static final String pendingPlayerBody = "dbem_bookings_mail_pending_body";
@@ -396,6 +398,25 @@ public class BookingsService {
 		}
 
 		bookingsDAO.save(booking);
+
+		// Update the GM record in postmeta
+		ArrayList<Postmeta> gmPostmetas = postMetaJPAInterface.findByPostIdAndMetaKey(
+				booking.getEventId().getPostId(), "GM");
+		Users user = usersDAO.findOne(userId);
+		if (gmPostmetas != null) {
+			if (gmPostmetas.size() > 1) {
+				logger.log(Level.SEVERE, "More than one GM record found for event " + eventId);
+			}
+			Postmeta gmPostmeta = gmPostmetas.get(0);
+			gmPostmeta.setMetaValue(user.getDisplayName());
+			postMetaJPAInterface.save(gmPostmeta);
+		} else {
+			logger.info("No GM record found for event " + eventId + ": creating one");
+			Postmeta gmPostmeta = new Postmeta();
+			gmPostmeta.setPostId(booking.getEventId().getPostId());
+			gmPostmeta.setMetaKey("GM");
+			gmPostmeta.setMetaValue(user.getDisplayName());
+		}
 
 	}
 
