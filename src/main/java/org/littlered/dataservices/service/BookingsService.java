@@ -75,6 +75,9 @@ public class BookingsService {
 	@Value("${bookings.quota}")
 	private String quota;
 
+	@Value("${email.signature}")
+	private String emailSignature;
+
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private static final String pendingPlayerSubject = "dbem_bookings_email_pending_subject";
@@ -432,8 +435,20 @@ public class BookingsService {
 		String subject = optionsDAO.findByName(confirmedPlayerSubject).getOptionValue();
 		String body = optionsDAO.findByName(confirmedPlayerBody).getOptionValue();
 
+		String defaultEventDateFormat = "EEEE, MMMM dd, YYYY";
+		String defaultEventTimeFormat = "hh:mm aa";
+		SimpleDateFormat dateFormat = new SimpleDateFormat(defaultEventDateFormat);
+		SimpleDateFormat timeFormat = new SimpleDateFormat(defaultEventTimeFormat);
+
 		body = body.replaceAll("#_BOOKINGNAME", user.getDisplayName());
+		body = body.replaceAll("#_BOOKINGSPACES", "one");
 		body = body.replaceAll("#_NAME", event.getEventName());
+		body = body.replaceAll("#_EVENTNAME", event.getEventName());
+		body = body.replaceAll("#_EVENTDATES", dateFormat.format(event.getEventStart()));
+		body = body.replaceAll("#_EVENTTIMES", timeFormat.format(event.getEventStart()));
+		body = body.replaceAll("#_LOCATIONNAME", "n/a");
+		body = body.replaceAll("#_LOCATIONFULLLINE", "n/a");
+		body = body.replaceAll("#_CONTACTNAME", emailSignature);
 
 		subject = subject.replaceAll("#_NAME", event.getEventName());
 		if (subject == null || subject.equals("")) {
