@@ -23,6 +23,7 @@ public final class Constants {
 	public static String ROLE_NOTATTENDING = "notattending";
 	public static String ROLE_NOTATTENDINGTHISYEAR = "notattendingthisyear";
 	public static String ROLE_VOLUNTEER = "volunteer";
+	public static String ROLE_PAIDATTENDEE = "paidattendee";
 	public static String ROLE_GM = "gm";
 	public static String ROLE_TEEN = "teen";
 

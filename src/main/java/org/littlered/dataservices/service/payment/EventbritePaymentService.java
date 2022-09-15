@@ -52,5 +52,6 @@ public class EventbritePaymentService {
 		}
 		String key = Constants.EVENTBRITE_ORDER_USERMETA_PREFIX.concat(eventbriteEventId);
 		usersJPAService.createUserMeta(user, key, orderId);
+		usersJPAService.addUserRole(user.getId(), Constants.ROLE_PAIDATTENDEE);
 	}
 }
