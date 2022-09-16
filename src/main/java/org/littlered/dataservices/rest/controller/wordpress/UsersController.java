@@ -5,10 +5,7 @@ import org.littlered.dataservices.dto.wordpress.CreateUsersDTO;
 import org.littlered.dataservices.dto.wordpress.UsersDTO;
 import org.littlered.dataservices.entity.wordpress.Users;
 import org.littlered.dataservices.exception.UniqueUserException;
-import org.littlered.dataservices.rest.params.eventManager.AddUserRole;
-import org.littlered.dataservices.rest.params.eventManager.ConfirmPasswordRequest;
-import org.littlered.dataservices.rest.params.eventManager.PasswordResetRequest;
-import org.littlered.dataservices.rest.params.eventManager.UserPassword;
+import org.littlered.dataservices.rest.params.eventManager.*;
 import org.littlered.dataservices.service.SecurityService;
 import org.littlered.dataservices.service.UsersJPAService;
 import org.littlered.dataservices.service.UsersService;
@@ -126,7 +123,28 @@ public class UsersController {
 		}
 
 		try {
+			securityService.checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
 			List<String> roles = usersJPAService.addUserRole(userRole.getUserId(), userRole.getRole());
+			return roles;
+		}
+		catch (SecurityException se) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return null;
+		}
+	}
+
+	@ApiOperation(value = "Remove a role from a user. Admin only.", response = Boolean.class)
+	@RequestMapping(value = "/removeRoleFromUser", method = RequestMethod.POST)
+	public List<String> removeRoleFromUser(@RequestBody UserRole userRole , HttpServletResponse response) throws Exception {
+
+		if (userRole == null || userRole.getUserId() == null || userRole.getRole() == null || userRole.getRole().equals("")) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return null;
+		}
+
+		try {
+			securityService.checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
+			List<String> roles = usersJPAService.removeUserRole(userRole.getUserId(), userRole.getRole());
 			return roles;
 		}
 		catch (SecurityException se) {
