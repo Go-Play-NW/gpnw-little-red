@@ -46,17 +46,17 @@ public interface EventsRepositoryInterface extends PagingAndSortingRepository<Em
 	List<EmEvents> findFavoritesForUser(Long userId, Integer year);
 
 	@Query(value ="select e.event_id, coalesce(cast(pm.meta_value as signed) - count(b.booking_id), 0) as seats \n" +
-			"from wp_tuiny5_em_events e \n" +
-			"left join wp_tuiny5_em_bookings b on e.event_id = b.event_id and (b.booking_comment is null or b.booking_comment = '') and b.booking_status = 1 \n" +
-			"left join wp_tuiny5_postmeta pm on e.post_id = pm.post_id and pm.meta_key = 'Players'\n" +
+			"from wp_goplaynw_em_events e \n" +
+			"left join wp_goplaynw_em_bookings b on e.event_id = b.event_id and (b.booking_comment is null or b.booking_comment = '') and b.booking_status = 1 \n" +
+			"left join wp_goplaynw_postmeta pm on e.post_id = pm.post_id and pm.meta_key = 'Players'\n" +
 			"where year(e.event_start_date) = ?1 \n" +
 			"group by e.event_id, pm.meta_id", nativeQuery = true)
 	List <Object[]> getBookingCounts(Integer bookingYear);
 
 	@Query(value ="select e.event_id, coalesce(cast(pm.meta_value as signed) - count(b.booking_id), 0) as seats \n" +
-			"from wp_tuiny5_em_events e \n" +
-			"left join wp_tuiny5_em_bookings b on e.event_id = b.event_id and (b.booking_comment is null or b.booking_comment = '') and b.booking_status = 1 \n" +
-			"left join wp_tuiny5_postmeta pm on e.post_id = pm.post_id and pm.meta_key = 'Players'\n" +
+			"from wp_goplaynw_em_events e \n" +
+			"left join wp_goplaynw_em_bookings b on e.event_id = b.event_id and (b.booking_comment is null or b.booking_comment = '') and b.booking_status = 1 \n" +
+			"left join wp_goplaynw_postmeta pm on e.post_id = pm.post_id and pm.meta_key = 'Players'\n" +
 			"where e.event_id = ?1 \n" +
 			"group by e.event_id, pm.meta_id", nativeQuery = true)
 	List <Object[]> getBookingCountForEvent(Long eventId);
