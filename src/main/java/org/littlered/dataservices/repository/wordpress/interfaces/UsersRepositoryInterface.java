@@ -1,6 +1,7 @@
 package org.littlered.dataservices.repository.wordpress.interfaces;
 
 import org.littlered.dataservices.entity.wordpress.Users;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,6 +17,7 @@ public interface UsersRepositoryInterface extends PagingAndSortingRepository<Use
 
 	ArrayList<Users> findByUserLogin(String userName);
 
+	@Query(value = "select u from Users u where u.userEmail = ?1")
 	ArrayList<Users> findByUserEmail(String userEmail);
 
 }

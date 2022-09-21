@@ -50,7 +50,16 @@ public class UsersService {
 		securityService.checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
 		ArrayList<org.littlered.dataservices.entity.wordpress.Users> users = usersRepository.findByUserLogin(userName);
 		if(users == null || users.size() == 0) {
-			throw new SecurityException(Constants.unauthorizedMessage);
+			throw new Exception("No user found!");
+		}
+		return wrapUser(users.get(0));
+	}
+
+	public UsersDTO getUserByEmail(String email) throws Exception {
+		securityService.checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
+		ArrayList<org.littlered.dataservices.entity.wordpress.Users> users = usersRepository.findByUserEmail(email);
+		if(users == null || users.size() == 0) {
+			throw new Exception("No user found!");
 		}
 		return wrapUser(users.get(0));
 	}

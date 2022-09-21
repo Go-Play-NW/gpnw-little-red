@@ -13,9 +13,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by Jeremy on 4/2/2017.
@@ -229,6 +233,20 @@ public class EventsService {
 		}
 		bbcUserFavoritesInterface.delete(favorite);
 
+	}
+
+	public Map<BigInteger, BigInteger> getBookingCounts() {
+		List<Object[]> counts = eventsRepository.getBookingCounts(Integer.parseInt(getFilterYear()));
+		Map<BigInteger, BigInteger> countMap = counts.stream().collect(Collectors.toMap(e -> ((BigInteger)e[0]), e -> ((BigInteger)e[1])));
+		return countMap;
+	}
+
+	public BigInteger getBookingCountForEvent(Long eventId) {
+		List<Object[]> counts = eventsRepository.getBookingCountForEvent(eventId);
+		if (counts == null || counts.size() == 0) {
+			return null;
+		}
+		return ((BigInteger)counts.get(0)[1]);
 	}
 
 }

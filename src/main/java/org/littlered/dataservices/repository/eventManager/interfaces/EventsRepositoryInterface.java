@@ -37,11 +37,27 @@ public interface EventsRepositoryInterface extends PagingAndSortingRepository<Em
 	Long getNumberOfEventsByYear(Integer year);
 
 	@Query(value = "SELECT DISTINCT b.eventId from EmBookings b " +
-			" where (b.eventId.lastUpdated > FUNCTION('from_unixtime', ?1)  " +
+			" where (b.eventId.lastUpdated > FUNCTION('from_un	ixtime', ?1)  " +
 			"    or b.lastUpdated > FUNCTION('from_unixtime', ?1)) " +
 			"   and FUNCTION('YEAR', b.eventId.eventStartDate) = ?2")
 	List<EmEvents> findUpdatedEventsAfterEpochDate(Long epochTime, Integer year);
 
 	@Query(value = "SELECT e FROM EmEvents e, BbcUserFavorites f WHERE e.eventId = f.eventId and f.userId = ?1 AND FUNCTION('YEAR', e.eventStartDate) = ?2 ")
 	List<EmEvents> findFavoritesForUser(Long userId, Integer year);
+
+	@Query(value ="select e.event_id, coalesce(cast(pm.meta_value as signed) - count(b.booking_id), 0) as seats \n" +
+			"from wp_tuiny5_em_events e \n" +
+			"left join wp_tuiny5_em_bookings b on e.event_id = b.event_id and (b.booking_comment is null or b.booking_comment = '') and b.booking_status = 1 \n" +
+			"left join wp_tuiny5_postmeta pm on e.post_id = pm.post_id and pm.meta_key = 'Players'\n" +
+			"where year(e.event_start_date) = ?1 \n" +
+			"group by e.event_id, pm.meta_id", nativeQuery = true)
+	List <Object[]> getBookingCounts(Integer bookingYear);
+
+	@Query(value ="select e.event_id, coalesce(cast(pm.meta_value as signed) - count(b.booking_id), 0) as seats \n" +
+			"from wp_tuiny5_em_events e \n" +
+			"left join wp_tuiny5_em_bookings b on e.event_id = b.event_id and (b.booking_comment is null or b.booking_comment = '') and b.booking_status = 1 \n" +
+			"left join wp_tuiny5_postmeta pm on e.post_id = pm.post_id and pm.meta_key = 'Players'\n" +
+			"where e.event_id = ?1 \n" +
+			"group by e.event_id, pm.meta_id", nativeQuery = true)
+	List <Object[]> getBookingCountForEvent(Long eventId);
 }

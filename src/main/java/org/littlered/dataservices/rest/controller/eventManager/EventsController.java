@@ -1,7 +1,7 @@
 package org.littlered.dataservices.rest.controller.eventManager;
 
 import org.littlered.dataservices.rest.params.UploadFileResponse;
-import org.littlered.dataservices.service.FileStorageService;
+import org.littlered.dataservices.service.*;
 import org.littlered.dataservices.Constants;
 import org.littlered.dataservices.dto.littlered.EventMetadataDTO;
 import org.littlered.dataservices.dto.eventManager.CreateEventDTO;
@@ -10,10 +10,6 @@ import org.littlered.dataservices.exception.FavoritingException;
 import org.littlered.dataservices.rest.params.eventManager.FavoriteEvent;
 import org.littlered.dataservices.rest.params.eventManager.EventAndUser;
 import org.littlered.dataservices.rest.params.eventManager.EventFind;
-import org.littlered.dataservices.service.EventsJPAService;
-import org.littlered.dataservices.service.EventsService;
-import org.littlered.dataservices.service.FavoritesService;
-import org.littlered.dataservices.service.UsersService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -26,7 +22,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by Jeremy on 3/25/2017.
@@ -50,6 +48,9 @@ public class EventsController {
 
 	@Autowired
 	private FileStorageService fileStorageService;
+
+	@Autowired
+	private BookingsService bookingsService;
 
 	@Value("${file.download.baseUri}")
 	private String fileDownloadBaseUri;
@@ -284,6 +285,19 @@ public class EventsController {
 
 		return new UploadFileResponse(fileName, fileDownloadUri,
 				file.getContentType(), file.getSize());
+	}
+
+
+	@ApiOperation(value = "Count of bookings for published games in the current year", response = Map.class)
+	@RequestMapping(value = "/spaces/public", method = RequestMethod.GET, produces = "application/json")
+	public Map<BigInteger, BigInteger> getBookingCounts() throws Exception {
+		return eventsService.getBookingCounts();
+	}
+
+	@ApiOperation(value = "Count of bookings for published games in the current year", response = Map.class)
+	@RequestMapping(value = "/{eventId}/spaces/public", method = RequestMethod.GET, produces = "application/json")
+	public BigInteger getBookingCountsForEvent(@PathVariable("eventId") Long eventId) throws Exception {
+		return eventsService.getBookingCountForEvent(eventId);
 	}
 
 }

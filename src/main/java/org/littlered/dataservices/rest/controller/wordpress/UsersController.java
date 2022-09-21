@@ -74,6 +74,19 @@ public class UsersController {
 		return user;
 	}
 
+	@ApiOperation(value = "Display information on a user, searching by email. Admin only.", response = UsersDTO.class)
+	@RequestMapping(value = "/email/{email}", method = RequestMethod.GET)
+	public UsersDTO findUserByEmail(@PathVariable(value="email")String email, HttpServletResponse response) throws Exception {
+		UsersDTO user = null;
+		try {
+			user = usersService.getUserByEmail(email);
+		}
+		catch (SecurityException e) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		}
+		return user;
+	}
+
 	@ApiOperation(value = "Display information on a user, searching by ID. Admin only.", response = UsersDTO.class)
 	@RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
 	public UsersDTO findUserById(@PathVariable Long id, HttpServletResponse response) throws Exception {
@@ -115,7 +128,7 @@ public class UsersController {
 
 	@ApiOperation(value = "Add a role to a user. Admin only.", response = Boolean.class)
 	@RequestMapping(value = "/addRoleToUser", method = RequestMethod.POST)
-	public List<String> addRoleToUser(@RequestBody AddUserRole userRole , HttpServletResponse response) throws Exception {
+	public List<String> addRoleToUser(@RequestBody UserRole userRole , HttpServletResponse response) throws Exception {
 
 		if (userRole == null || userRole.getUserId() == null || userRole.getRole() == null || userRole.getRole().equals("")) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
