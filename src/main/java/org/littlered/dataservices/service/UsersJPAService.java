@@ -1,5 +1,6 @@
 package org.littlered.dataservices.service;
 
+import org.littlered.dataservices.Constants;
 import org.littlered.dataservices.dto.wordpress.CreateUsersDTO;
 import org.littlered.dataservices.entity.wordpress.Usermeta;
 import org.littlered.dataservices.entity.wordpress.Users;
@@ -226,5 +227,78 @@ public class UsersJPAService {
 		user.setDisplayName(displayName);
 		usersRepository.save(user);
 	}
+
+	@Transactional
+	public void addOrUpdateUserMeta(Long userId, String metaKey, String metaValue) {
+		List<Usermeta> foundUsermetas = usermetaJPAInterface.findUsermetaByUserIdAndMetaKey(userId, metaKey);
+		if (foundUsermetas == null || foundUsermetas.size() == 0) {
+			Usermeta usermeta = new Usermeta();
+			usermeta.setUserId(userId);
+			usermeta.setMetaKey(metaKey);
+			usermeta.setMetaValue(metaValue);
+			usermetaJPAInterface.save(usermeta);
+		} else {
+			Usermeta foundUsermeta = foundUsermetas.get(0);
+			foundUsermeta.setMetaValue(metaValue);
+			usermetaJPAInterface.save(foundUsermeta);
+		}
+
+	}
+	
+	public ArrayList<String> findUserRolesByDiscordId(String discordId) throws Exception {
+		
+		List<Usermeta> discordUsermetas = usermetaJPAInterface.findUsermetasByMetaKeyAndMetaValue(
+				Constants.DISCORD_ID_USERMETA_KEY, discordId);
+		if (discordUsermetas == null || discordUsermetas.size() == 0) {
+			throw new IllegalArgumentException("No user found with discord ID " + discordId);
+		}
+		if (discordUsermetas.size() > 1) {
+			throw new IllegalArgumentException("More than one user found with discord ID " + discordId);
+		}
+		Usermeta discordUserMeta = discordUsermetas.get(0);
+
+		List<Usermeta> roleUsermetas =
+				usermetaJPAInterface.findUsermetaByUserIdAndMetaKey(discordUserMeta.getUserId(),
+						tablePrefix.concat("capabilities"));
+		if(roleUsermetas.size() > 1) {
+			throw new Exception("Multiple capabilities entries found for user");
+		}
+		Usermeta capabilities = roleUsermetas.get(0);
+
+		LinkedHashMap<String, Boolean> capList =
+				(LinkedHashMap<String, Boolean>) new SerializedPhpParser(capabilities.getMetaValue()).parse();
+		ArrayList<String> roles = new ArrayList<>(capList.keySet());
+
+		return roles;
+		
+	}
+
+	public HashMap<String, ArrayList<String>> findUserRolesForAllDiscordUsers() throws Exception {
+
+		List<Usermeta> discordUsermetas = usermetaJPAInterface.findUsermetasByMetaKey(
+				Constants.DISCORD_ID_USERMETA_KEY);
+		if (discordUsermetas == null || discordUsermetas.size() == 0) {
+			throw new IllegalArgumentException("No users found with discord IDs");
+		}
+
+		HashMap<String, ArrayList<String>> roles = new HashMap<>();
+
+		for (Usermeta discordUserMeta : discordUsermetas) {
+
+			List<Usermeta> roleUsermetas =
+					usermetaJPAInterface.findUsermetaByUserIdAndMetaKey(discordUserMeta.getUserId(),
+							tablePrefix.concat("capabilities"));
+			Usermeta capabilities = roleUsermetas.get(0);
+
+			LinkedHashMap<String, Boolean> capList =
+					(LinkedHashMap<String, Boolean>) new SerializedPhpParser(capabilities.getMetaValue()).parse();
+			ArrayList<String> userRoles = new ArrayList<>(capList.keySet());
+			roles.put(discordUserMeta.getMetaValue(), userRoles);
+		}
+
+		return roles;
+
+	}
+
 
 }

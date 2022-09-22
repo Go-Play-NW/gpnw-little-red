@@ -64,4 +64,6 @@ public final class Constants {
 	public static final String EVENTBRITE_TOKEN_USERMETA_KEY = "eventbrite_token";
 	public static final String EVENTBRITE_ORDER_USERMETA_PREFIX = "eventbrite_order_";
 
+	public static final String DISCORD_ID_USERMETA_KEY = "discord_id";
+
 }

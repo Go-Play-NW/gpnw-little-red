@@ -13,4 +13,8 @@ public interface UsermetaJPAInterface extends JpaRepository<Usermeta, Long> {
 	@Query(value = "select um from Usermeta um where um.userId = ?1 and um.metaKey = ?2")
 	List<Usermeta> findUsermetaByUserIdAndMetaKey(Long userId, String metaKey);
 
+	List<Usermeta> findUsermetasByMetaKeyAndMetaValue(String metaKey, String metaValue);
+
+	List<Usermeta> findUsermetasByMetaKey(String metaKey);
+
 }
