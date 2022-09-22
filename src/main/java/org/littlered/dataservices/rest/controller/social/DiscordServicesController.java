@@ -51,8 +51,8 @@ public class DiscordServicesController {
 	}
 
 	@ApiOperation(value = "Get user roles by Discord ID. Admin only.", response = GetRolesForDiscordUserResponse.class)
-	@RequestMapping(value = "/user/{discordId}/getRoles", method = RequestMethod.GET, produces = "application/json")
-	public GetRolesForDiscordUserResponse findUserRolesByDiscordId(@PathVariable("discordId") String discordId, HttpServletResponse response)
+	@RequestMapping(value = "/user/getRoles", method = RequestMethod.GET, produces = "application/json")
+	public GetRolesForDiscordUserResponse findUserRolesByDiscordId(@RequestParam("discordId") String discordId, HttpServletResponse response)
 			throws Exception {
 
 		logger.info("Getting roles for Discord ID " + discordId);
