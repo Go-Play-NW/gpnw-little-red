@@ -2,9 +2,12 @@ package org.littlered.dataservices.rest.controller.payment;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.littlered.dataservices.Constants;
+import org.littlered.dataservices.dto.wordpress.UsersDTO;
 import org.littlered.dataservices.entity.wordpress.Users;
 import org.littlered.dataservices.rest.params.payment.EventbriteOrder;
 import org.littlered.dataservices.rest.params.payment.EventbriteToken;
+import org.littlered.dataservices.service.SecurityService;
 import org.littlered.dataservices.service.UsersService;
 import org.littlered.dataservices.service.payment.EventbritePaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,9 @@ public class EventbritePaymentController {
 
 	@Autowired
 	private UsersService usersService;
+
+	@Autowired
+	private SecurityService securityService;
 
 	@Autowired
 	private EventbritePaymentService eventbritePaymentService;
@@ -40,6 +46,23 @@ public class EventbritePaymentController {
 		Users user = usersService.getCurrentUser();
 		eventbritePaymentService.receiveEventbriteOrderId(user, eventbriteOrder.getOrderId());
 		logger.info("Received Eventbrite order " + eventbriteOrder.getOrderId() + " for user " + user.getDisplayName());
+	}
+
+	@ApiOperation(value = "Display information on a user, searching by Eventbrite order id. Admin only.", response = UsersDTO.class)
+	@RequestMapping(value = "/orderId/{orderId}", method = RequestMethod.GET)
+	public UsersDTO findUserByEmail(@PathVariable(value="orderId")String orderId, HttpServletResponse response) throws Exception {
+		UsersDTO user = null;
+		try {
+			securityService.checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
+			user = eventbritePaymentService.findUserByEventbriteOrderId(orderId);
+		}
+		catch (SecurityException e) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		}
+		catch (IllegalArgumentException e) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
+		return user;
 	}
 
 }

@@ -1,14 +1,19 @@
 package org.littlered.dataservices.service.payment;
 
 import org.littlered.dataservices.Constants;
+import org.littlered.dataservices.dto.wordpress.UsersDTO;
 import org.littlered.dataservices.entity.wordpress.Usermeta;
 import org.littlered.dataservices.entity.wordpress.Users;
 import org.littlered.dataservices.repository.wordpress.interfaces.UsermetaJPAInterface;
+import org.littlered.dataservices.repository.wordpress.interfaces.UsersJPAInterface;
+import org.littlered.dataservices.repository.wordpress.interfaces.UsersRepositoryInterface;
 import org.littlered.dataservices.service.UsersJPAService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 @Service
@@ -21,6 +26,9 @@ public class EventbritePaymentService {
 
 	@Autowired
 	private UsermetaJPAInterface usermetaJPAInterface;
+
+	@Autowired
+	private UsersRepositoryInterface usersRepositoryInterface;
 
 	@Value("${eventbrite.api.key}")
 	private String eventbriteApiKey;
@@ -55,4 +63,25 @@ public class EventbritePaymentService {
 		usersJPAService.removeUserRole(user.getId(), Constants.ROLE_NOTATTENDING);
 		usersJPAService.addUserRole(user.getId(), Constants.ROLE_PAIDATTENDEE);
 	}
+
+	public UsersDTO findUserByEventbriteOrderId(String orderId) throws Exception {
+		logger.info("Looking up user by Eventbrite order ID " + orderId);
+
+		List<Usermeta> discordUsermetas = usermetaJPAInterface.findUsermetasByMetaKeyAndMetaValue(
+				Constants.EVENTBRITE_ORDER_USERMETA_PREFIX.concat(eventbriteEventId), orderId);
+
+		if(discordUsermetas.size() == 0) {
+			throw new IllegalArgumentException("No account with that order ID found!");
+		}
+		if(discordUsermetas.size() > 1) {
+			throw new IllegalArgumentException("Multiple accounts with that order ID found!");
+		}
+
+		ArrayList<Users> users = usersRepositoryInterface.findById(discordUsermetas.get(0).getUserId());
+		UsersDTO dto = new UsersDTO();
+		dto.wrapEntity(users.get(0));
+		return dto;
+
+	}
+
 }
