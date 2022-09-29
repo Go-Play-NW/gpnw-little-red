@@ -25578,6 +25578,7 @@
           "item.subtotal",
           "item.tax_exclusive",
           "item.tax_inclusive",
+          "item.net-includable",
           "zero_base"
         ],
         "type": "string",
