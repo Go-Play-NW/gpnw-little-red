@@ -469,7 +469,9 @@ public class EmEvents implements Serializable {
 			"'exempt', " +
 			"'event_image', " +
 			"'trigger_warnings', " +
+			"'content-warnings', " +
 			"'event_tags', " +
+			"'game-tags', " +
 			"'format', " +
 			"'safety_tools') " +
 			" or meta_key like '%\\_shift'")
