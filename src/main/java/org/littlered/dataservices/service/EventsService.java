@@ -271,11 +271,18 @@ public class EventsService {
 			badge.setFacilitatorName(event.getEventOwner().getDisplayName());
 			badge.setGameTitle(event.getEventName());
 			badge.setGameTime(format.format(event.getEventStart()));
-			badge.setGamePitch(event.getPostContent());
+
+			String gamePitch = event.getPostContent();
+			gamePitch = gamePitch.replaceAll("\r", "");
+			gamePitch = gamePitch.replaceAll("\n", "");
+			badge.setGamePitch(gamePitch);
 
 			String minplayers = null;
 			String maxplayers = null;
 			for(Postmeta meta: event.getMetadata()) {
+				if (meta.getMetaKey().equals("event_image") && meta.getMetaValue() != null && !meta.getMetaValue().equals("")) {
+					badge.setGameArt("images/".concat(meta.getMetaValue()));
+				}
 				if (meta.getMetaKey().equals("Min_Players")) {
 					minplayers = meta.getMetaValue();
 				}
@@ -305,11 +312,9 @@ public class EventsService {
 			}
 			if (minplayers != null && maxplayers != null) {
 				badge.setNumberofPlayers(minplayers.concat(" - ").concat(maxplayers));
-				int minPlayersInt = Integer.parseInt(minplayers);
-				int maxPlayersInt = Integer.parseInt(maxplayers);
-				int slotsOpen = maxPlayersInt - minPlayersInt;
+				String slotsOpen = minplayers.concat("-").concat(maxplayers);
 				if (!minplayers.equals(maxplayers)) {
-					badge.setGamePlayersList("/players_name-list/".concat(Integer.toString(slotsOpen)).concat(".png"));
+					badge.setGamePlayersList("/players_name-list/".concat(slotsOpen).concat(".png"));
 				} else {
 					badge.setGamePlayersList("/players_name-list/".concat(maxplayers).concat(".png"));
 				}
