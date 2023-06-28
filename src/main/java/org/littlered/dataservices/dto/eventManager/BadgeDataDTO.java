@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class BadgeDataDTO implements Serializable {
 
+	private Long eventId;
 	private String facilitatorName;
 	private String gameTitle;
 	private String gameArt;
@@ -184,5 +185,13 @@ public class BadgeDataDTO implements Serializable {
 
 	public void setSafetyTools(String safetyTools) {
 		this.safetyTools = safetyTools;
+	}
+
+	public Long getEventId() {
+		return eventId;
+	}
+
+	public void setEventId(Long eventId) {
+		this.eventId = eventId;
 	}
 }

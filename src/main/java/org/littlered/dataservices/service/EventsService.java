@@ -260,7 +260,14 @@ public class EventsService {
 
 		Iterable<org.littlered.dataservices.entity.eventManager.EmEvents> events = findAll();
 		for (org.littlered.dataservices.entity.eventManager.EmEvents event : events) {
+			if (event.getEventStatus() != 1) {
+				continue;
+			}
+			if (event.getEventName().startsWith("Volunteer")) {
+				continue;
+			}
 			BadgeDataDTO badge = new BadgeDataDTO();
+			badge.setEventId(event.getEventId());
 			badge.setFacilitatorName(event.getEventOwner().getDisplayName());
 			badge.setGameTitle(event.getEventName());
 			badge.setGameTime(format.format(event.getEventStart()));
@@ -310,6 +317,9 @@ public class EventsService {
 
 			int playercount = 1;
 			for(EmBookings booking : event.getBookings()) {
+				if (booking.getBookingStatus() != 1) {
+					continue;
+				}
 				if (booking.getBookingComment() != null && booking.getBookingComment().equalsIgnoreCase("GM")) {
 					continue;
 				}
