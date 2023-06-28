@@ -1,8 +1,11 @@
 package org.littlered.dataservices.service;
 
 import org.littlered.dataservices.Constants;
+import org.littlered.dataservices.dto.eventManager.BadgeDataDTO;
+import org.littlered.dataservices.entity.eventManager.EmBookings;
 import org.littlered.dataservices.entity.eventManager.pub.EmEvents;
 import org.littlered.dataservices.entity.wordpress.BbcUserFavorites;
+import org.littlered.dataservices.entity.wordpress.Postmeta;
 import org.littlered.dataservices.exception.FavoritingException;
 import org.littlered.dataservices.repository.eventManager.interfaces.BookingsRepositoryInterface;
 import org.littlered.dataservices.repository.eventManager.interfaces.EventsPublicRepositoryInterface;
@@ -15,10 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -249,4 +250,92 @@ public class EventsService {
 		return ((BigInteger)counts.get(0)[1]);
 	}
 
+	public List<BadgeDataDTO> getBadgeData() throws Exception {
+
+		securityService.checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
+
+		List<BadgeDataDTO> badges = new ArrayList<>();
+
+		SimpleDateFormat format = new SimpleDateFormat("E h:mm a", Locale.US);
+
+		Iterable<org.littlered.dataservices.entity.eventManager.EmEvents> events = findAll();
+		for (org.littlered.dataservices.entity.eventManager.EmEvents event : events) {
+			BadgeDataDTO badge = new BadgeDataDTO();
+			badge.setFacilitatorName(event.getEventOwner().getDisplayName());
+			badge.setGameTitle(event.getEventName());
+			badge.setGameTime(format.format(event.getEventStart()));
+			badge.setGamePitch(event.getPostContent());
+
+			String minplayers = null;
+			String maxplayers = null;
+			for(Postmeta meta: event.getMetadata()) {
+				if (meta.getMetaKey().equals("Min_Players")) {
+					minplayers = meta.getMetaValue();
+				}
+				if (meta.getMetaKey().equals("Players")) {
+					maxplayers = meta.getMetaValue();
+				}
+				if (meta.getMetaValue().equals("Playtest")) {
+					if (meta.getMetaValue().equals(("1"))) {
+						badge.setPlaytest("/layout_graphics/playtest.png");
+					}
+				}
+				if (meta.getMetaKey().equals("event_tags") && meta.getMetaValue().contains("Playtest")) {
+					badge.setPlaytest("/layout_graphics/playtest.png");
+				}
+				if (meta.getMetaKey().equals("System")) {
+					badge.setSystem(meta.getMetaValue());
+				}
+				if (meta.getMetaKey().equals("event_tags") && meta.getMetaValue() != null) {
+					badge.setGameTags("Tags: ".concat(meta.getMetaValue()));
+				}
+				if (meta.getMetaKey().equals("trigger_warnings") && meta.getMetaValue() != null) {
+					badge.setContentWarnings("Content Warnings: ".concat(meta.getMetaValue()));
+				}
+				if (meta.getMetaKey().equals("safety_tools") && meta.getMetaValue() != null) {
+					badge.setSafetyTools(meta.getMetaValue());
+				}
+			}
+			if (minplayers != null && maxplayers != null) {
+				badge.setNumberofPlayers(minplayers.concat(" - ").concat(maxplayers));
+				int minPlayersInt = Integer.parseInt(minplayers);
+				int maxPlayersInt = Integer.parseInt(maxplayers);
+				int slotsOpen = maxPlayersInt - minPlayersInt;
+				if (!minplayers.equals(maxplayers)) {
+					badge.setGamePlayersList("/players_name-list/".concat(Integer.toString(slotsOpen)).concat(".png"));
+				} else {
+					badge.setGamePlayersList("/players_name-list/".concat(maxplayers).concat(".png"));
+				}
+			}
+
+			int playercount = 1;
+			for(EmBookings booking : event.getBookings()) {
+				if (booking.getBookingComment() != null && booking.getBookingComment().equalsIgnoreCase("GM")) {
+					continue;
+				}
+				if (playercount > 6) {
+					break;
+				}
+				String bookingname = booking.getUser().getDisplayName().concat(" "); //.concat(booking.getBookingId().toString());
+				switch(playercount) {
+					case 1: badge.setPlayer1(bookingname);
+						break;
+					case 2: badge.setPlayer2(bookingname);
+						break;
+					case 3: badge.setPlayer3(bookingname);
+						break;
+					case 4: badge.setPlayer4(bookingname);
+						break;
+					case 5: badge.setPlayer5(bookingname);
+						break;
+					case 6: badge.setPlayer6(bookingname);
+						break;
+				}
+				playercount++;
+			}
+			badges.add(badge);
+		}
+
+		return badges;
+	}
 }

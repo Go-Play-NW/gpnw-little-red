@@ -1,5 +1,6 @@
 package org.littlered.dataservices.rest.controller.eventManager;
 
+import org.littlered.dataservices.dto.eventManager.BadgeDataDTO;
 import org.littlered.dataservices.rest.params.UploadFileResponse;
 import org.littlered.dataservices.service.*;
 import org.littlered.dataservices.Constants;
@@ -298,6 +299,12 @@ public class EventsController {
 	@RequestMapping(value = "/{eventId}/spaces/public", method = RequestMethod.GET, produces = "application/json")
 	public BigInteger getBookingCountsForEvent(@PathVariable("eventId") Long eventId) throws Exception {
 		return eventsService.getBookingCountForEvent(eventId);
+	}
+
+	@ApiOperation(value = "Data for badge generation for the current year", response = BadgeDataDTO.class, responseContainer = "Iterable")
+	@RequestMapping(value = "/badgedata", method = RequestMethod.GET, produces = "application/json")
+	public Iterable<BadgeDataDTO> getBadgeData() throws Exception {
+		return eventsService.getBadgeData();
 	}
 
 }
