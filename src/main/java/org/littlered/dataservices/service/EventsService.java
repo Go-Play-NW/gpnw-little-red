@@ -293,10 +293,10 @@ public class EventsService {
 				if (meta.getMetaKey().equals("System")) {
 					badge.setSystem(meta.getMetaValue());
 				}
-				if (meta.getMetaKey().equals("event_tags") && meta.getMetaValue() != null) {
+				if (meta.getMetaKey().equals("event_tags") && meta.getMetaValue() != null && !meta.getMetaValue().equals("")) {
 					badge.setGameTags("Tags: ".concat(meta.getMetaValue()));
 				}
-				if (meta.getMetaKey().equals("trigger_warnings") && meta.getMetaValue() != null) {
+				if (meta.getMetaKey().equals("trigger_warnings") && meta.getMetaValue() != null && !meta.getMetaValue().equals("")) {
 					badge.setContentWarnings("Content Warnings: ".concat(meta.getMetaValue()));
 				}
 				if (meta.getMetaKey().equals("safety_tools") && meta.getMetaValue() != null) {
