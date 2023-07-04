@@ -1,7 +1,7 @@
 package org.littlered.dataservices.service;
 
 import org.littlered.dataservices.Constants;
-import org.littlered.dataservices.dto.eventManager.BadgeDataDTO;
+import org.littlered.dataservices.dto.eventManager.EventScheduleDataDTO;
 import org.littlered.dataservices.entity.eventManager.EmBookings;
 import org.littlered.dataservices.entity.eventManager.pub.EmEvents;
 import org.littlered.dataservices.entity.wordpress.BbcUserFavorites;
@@ -250,11 +250,11 @@ public class EventsService {
 		return ((BigInteger)counts.get(0)[1]);
 	}
 
-	public List<BadgeDataDTO> getBadgeData() throws Exception {
+	public List<EventScheduleDataDTO> getEventData(String focus) throws Exception {
 
 		securityService.checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
 
-		List<BadgeDataDTO> badges = new ArrayList<>();
+		List<EventScheduleDataDTO> badges = new ArrayList<>();
 
 		SimpleDateFormat format = new SimpleDateFormat("E h:mm a", Locale.US);
 
@@ -263,10 +263,13 @@ public class EventsService {
 			if (event.getEventStatus() != 1) {
 				continue;
 			}
-			if (event.getEventName().startsWith("Volunteer")) {
+			if (focus == null && event.getEventName().startsWith("Volunteer")) {
 				continue;
 			}
-			BadgeDataDTO badge = new BadgeDataDTO();
+			if (focus != null && focus.equals("volunteer") && !event.getEventName().startsWith("Volunteer")) {
+				continue;
+			}
+			EventScheduleDataDTO badge = new EventScheduleDataDTO();
 			badge.setEventId(event.getEventId());
 			badge.setFacilitatorName(event.getEventOwner().getDisplayName());
 			badge.setGameTitle(event.getEventName());
@@ -311,7 +314,7 @@ public class EventsService {
 				}
 			}
 			if (minplayers != null && maxplayers != null) {
-				badge.setNumberofPlayers(minplayers.concat(" - ").concat(maxplayers));
+				badge.setNumberofPlayers(minplayers.concat("-").concat(maxplayers));
 				String slotsOpen = minplayers.concat("-").concat(maxplayers);
 				if (!minplayers.equals(maxplayers)) {
 					badge.setGamePlayersList("/players_name-list/".concat(slotsOpen).concat(".png"));

@@ -2,7 +2,7 @@ package org.littlered.dataservices.dto.eventManager;
 
 import java.io.Serializable;
 
-public class BadgeDataDTO implements Serializable {
+public class EventScheduleDataDTO implements Serializable {
 
 	private Long eventId;
 	private String facilitatorName;

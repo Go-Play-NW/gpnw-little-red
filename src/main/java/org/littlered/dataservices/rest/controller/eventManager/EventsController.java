@@ -1,6 +1,6 @@
 package org.littlered.dataservices.rest.controller.eventManager;
 
-import org.littlered.dataservices.dto.eventManager.BadgeDataDTO;
+import org.littlered.dataservices.dto.eventManager.EventScheduleDataDTO;
 import org.littlered.dataservices.rest.params.UploadFileResponse;
 import org.littlered.dataservices.service.*;
 import org.littlered.dataservices.Constants;
@@ -301,10 +301,16 @@ public class EventsController {
 		return eventsService.getBookingCountForEvent(eventId);
 	}
 
-	@ApiOperation(value = "Data for badge generation for the current year", response = BadgeDataDTO.class, responseContainer = "Iterable")
-	@RequestMapping(value = "/badgedata", method = RequestMethod.GET, produces = "application/json")
-	public Iterable<BadgeDataDTO> getBadgeData() throws Exception {
-		return eventsService.getBadgeData();
+	@ApiOperation(value = "Data for badge generation for the current year", response = EventScheduleDataDTO.class, responseContainer = "Iterable")
+	@RequestMapping(value = "/eventdata", method = RequestMethod.GET, produces = "application/json")
+	public Iterable<EventScheduleDataDTO> getEventScheduleData() throws Exception {
+		return eventsService.getEventData(null);
+	}
+
+	@ApiOperation(value = "Data for badge generation for the current year", response = EventScheduleDataDTO.class, responseContainer = "Iterable")
+	@RequestMapping(value = "/volunteerdata", method = RequestMethod.GET, produces = "application/json")
+	public Iterable<EventScheduleDataDTO> getVolunteerScheduleData() throws Exception {
+		return eventsService.getEventData("volunteer");
 	}
 
 }
