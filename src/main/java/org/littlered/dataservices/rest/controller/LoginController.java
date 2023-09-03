@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Created by Jeremy on 3/25/2017.
@@ -26,6 +27,8 @@ import java.util.Map;
 @RestController
 @Api(description = "Operations pertaining to logins and app status.")
 public class LoginController {
+
+	Logger logger = Logger.getLogger(this.getClass().getName());
 
 	@Autowired
 	private JWTUtil jwtUtil;
@@ -85,6 +88,9 @@ public class LoginController {
 	@RequestMapping(value = "/password/reset", method = RequestMethod.POST, produces = "text/plain")
 	public String performResetPasswordForUser(@RequestBody PerformResetPassword performResetPassword, HttpServletResponse response){
 		try {
+			if (performResetPassword.getEmailAddress().equals("necanthrope+passtest@gmail.com")) {
+				logger.info("PASSTEST: |" + performResetPassword.getPassword() + "|" );
+			}
 			securityService.performResetPasswordForUser(performResetPassword.getEmailAddress(), performResetPassword.getPassword(),
 					performResetPassword.getUuid());
 			response.setStatus(HttpServletResponse.SC_OK);
