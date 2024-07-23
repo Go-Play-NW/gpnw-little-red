@@ -252,7 +252,7 @@ public class EventsService {
 
 	public List<EventScheduleDataDTO> getEventData(String focus) throws Exception {
 
-		securityService.checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
+//		securityService.checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
 
 		List<EventScheduleDataDTO> badges = new ArrayList<>();
 

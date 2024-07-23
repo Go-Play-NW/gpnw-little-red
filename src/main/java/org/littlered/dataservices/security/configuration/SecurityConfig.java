@@ -65,6 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers(HttpMethod.GET, "/events/page/public/**").permitAll()
 				.antMatchers(HttpMethod.GET, "/events/spaces/public").permitAll()
 				.antMatchers(HttpMethod.GET, "/events/**/spaces/public").permitAll()
+//				.antMatchers(HttpMethod.GET, "/events/eventmenus").permitAll()
 				.antMatchers(HttpMethod.PUT, "/users/create").permitAll()
 				.anyRequest().authenticated()
 				.and()

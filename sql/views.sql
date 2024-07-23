@@ -132,3 +132,42 @@ SET @sql := CONCAT(
 PREPARE stmt from @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
+
+
+CREATE OR REPLACE VIEW gpnw_game_list_v AS
+select
+  fac.meta_value 'facilitator_name',
+  e.event_name as 'game_title',
+  pm_i.meta_value as 'game_art',
+  case
+  	when pm_minp.meta_value = pm_maxp.meta_value then pm_minp.meta_value
+  	else concat(pm_minp.meta_value, concat('-', pm_maxp.meta_value))
+  end
+  as 'number_of_players',
+  e.event_start as 'game_time',
+  (select group_concat(bum.meta_value separator ', ') as 'ids'
+      from wp_goplaynw_em_bookings b, wp_goplaynw_usermeta bum
+      where b.event_id  = e.event_id
+      and  bum.user_id = b.person_id
+      and bum.meta_key = 'nickname'
+      and b.booking_status = 1
+      and (b.booking_comment = '' or b.booking_comment is null)
+      group by b.event_id) as 'players',
+  pm_pt.meta_value as 'playtest',
+  pm_ta.meta_value as 'game_tags',
+  pm_t.meta_value as 'content_warnings',
+  pm_sy.meta_value as 'system',
+  pm_s.meta_value as 'safety_tools'
+from wp_goplaynw_posts p
+left outer join wp_goplaynw_em_events e on e.post_id = p.ID
+left outer join wp_goplaynw_postmeta pm_t on pm_t.post_id = p.ID and pm_t.meta_key = 'trigger_warnings'
+left outer join wp_goplaynw_postmeta pm_s on pm_s.post_id = p.ID and pm_s.meta_key = 'safety_tools'
+left outer join wp_goplaynw_postmeta pm_sy on pm_sy.post_id = p.ID and pm_sy.meta_key = 'System'
+left outer join wp_goplaynw_postmeta pm_i on pm_i.post_id = p.ID and pm_i.meta_key = 'event_image'
+left outer join wp_goplaynw_postmeta pm_ta on pm_ta.post_id = p.ID and pm_ta.meta_key = 'event_tags'
+left outer join wp_goplaynw_postmeta pm_minp on pm_minp.post_id = p.ID and pm_minp.meta_key = 'Min_Players'
+left outer join wp_goplaynw_postmeta pm_maxp on pm_maxp.post_id = p.ID and pm_maxp.meta_key = 'Players'
+left outer join wp_goplaynw_postmeta pm_pt on pm_maxp.post_id = p.ID and pm_maxp.meta_key = 'playtest'
+left outer join wp_goplaynw_usermeta fac on e.event_owner = fac.user_id and fac.meta_key = 'nickname'
+where e.post_id = p.ID
+;
