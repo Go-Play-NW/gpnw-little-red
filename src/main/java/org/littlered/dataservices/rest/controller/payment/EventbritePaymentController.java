@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 @RestController
@@ -63,6 +64,12 @@ public class EventbritePaymentController {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		return user;
+	}
+
+	@ApiOperation(value = "", response = HashMap.class)
+	@RequestMapping(value = "/crowdfundingData", method = RequestMethod.GET)
+	public HashMap<String, String> crowdfundingData() {
+		return eventbritePaymentService.getCrowdfundingData();
 	}
 
 }

@@ -58,9 +58,6 @@ public class EventsController {
 	@Autowired
 	private BookingsService bookingsService;
 
-	@Autowired
-	private CSVService csvService;
-
 	@Value("${file.download.baseUri}")
 	private String fileDownloadBaseUri;
 
@@ -309,26 +306,13 @@ public class EventsController {
 		return eventsService.getBookingCountForEvent(eventId);
 	}
 
-	@ApiOperation(value = "Data for badge generation for the current year", response = EventScheduleDataDTO.class, responseContainer = "Iterable")
+	@ApiOperation(value = "Data for event schedule generation for the current year", response = EventScheduleDataDTO.class, responseContainer = "Iterable")
 	@RequestMapping(value = "/eventdata", method = RequestMethod.GET, produces = "application/json")
 	public Iterable<EventScheduleDataDTO> getEventScheduleData() throws Exception {
 		return eventsService.getEventData(null);
 	}
 
-
-	@ApiOperation(value = "Data for badge generation for the current year", response = EventScheduleDataDTO.class, responseContainer = "Iterable")
-	@RequestMapping(value = "/eventmenus", method = RequestMethod.GET, produces = "application/vnd.ms-excel")
-	public ResponseEntity<Resource> getEventScheduleSheetData() throws Exception {
-		String filename = "tutorials.csv";
-		InputStreamResource file = new InputStreamResource(csvService.load());
-
-		return ResponseEntity.ok()
-				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-				.contentType(MediaType.parseMediaType("application/csv"))
-				.body(file);
-	}
-
-	@ApiOperation(value = "Data for badge generation for the current year", response = EventScheduleDataDTO.class, responseContainer = "Iterable")
+	@ApiOperation(value = "Data for volunteer schedule generation for the current year", response = EventScheduleDataDTO.class, responseContainer = "Iterable")
 	@RequestMapping(value = "/volunteerdata", method = RequestMethod.GET, produces = "application/json")
 	public Iterable<EventScheduleDataDTO> getVolunteerScheduleData() throws Exception {
 		return eventsService.getEventData("volunteer");

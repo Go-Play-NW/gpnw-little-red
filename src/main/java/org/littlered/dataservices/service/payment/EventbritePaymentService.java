@@ -1,5 +1,6 @@
 package org.littlered.dataservices.service.payment;
 
+import org.apache.commons.lang3.StringUtils;
 import org.littlered.dataservices.Constants;
 import org.littlered.dataservices.dto.wordpress.UsersDTO;
 import org.littlered.dataservices.entity.wordpress.Usermeta;
@@ -8,11 +9,20 @@ import org.littlered.dataservices.repository.wordpress.interfaces.UsermetaJPAInt
 import org.littlered.dataservices.repository.wordpress.interfaces.UsersJPAInterface;
 import org.littlered.dataservices.repository.wordpress.interfaces.UsersRepositoryInterface;
 import org.littlered.dataservices.service.UsersJPAService;
+import org.openapitools.client.api.AttendeeApi;
+import org.openapitools.client.api.OrderApi;
+import org.openapitools.client.auth.HttpBearerAuth;
+import org.openapitools.client.model.Attendee1;
+import org.openapitools.client.model.ListOrdersbyEventIDresponse;
+import org.openapitools.client.model.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -35,6 +45,9 @@ public class EventbritePaymentService {
 
 	@Value("${eventbrite.event_id}")
 	private String eventbriteEventId;
+
+	@Value("${eventbrite.private.token}")
+	private String eventbritePrivateToken;
 
 
 	public void receiveEventbriteUserToken(Users user, String code ) throws Exception {
@@ -82,6 +95,59 @@ public class EventbritePaymentService {
 		dto.wrapEntity(users.get(0));
 		return dto;
 
+	}
+
+	public HashMap<String, String> getCrowdfundingData() {
+
+		HashMap<String, String> crowdfundingData = new HashMap<>();
+
+		OrderApi orderApi = new OrderApi();
+		HttpBearerAuth orderAuth = (HttpBearerAuth) orderApi.getApiClient().getAuthentications().get("httpBearer");
+		orderAuth.setBearerToken(eventbritePrivateToken);
+		orderApi.getApiClient().setDebugging(false);
+
+		AttendeeApi attendeeApi = new AttendeeApi();
+		HttpBearerAuth attendeeAuth = (HttpBearerAuth) attendeeApi.getApiClient().getAuthentications().get("httpBearer");
+		attendeeAuth.setBearerToken(eventbritePrivateToken);
+		attendeeApi.getApiClient().setDebugging(false);
+
+		try {
+			ListOrdersbyEventIDresponse response = orderApi.listOrdersbyEventID(eventbriteEventId, null, null, null, null,
+					null, null, "attendees");
+
+			HashMap<String, ArrayList<String>> orders = new HashMap<>();
+
+			int tickets = 0;
+			BigDecimal totalRaised = BigDecimal.ZERO;
+			if (response.getOrders() != null) {
+				orders:
+				for (Order order : response.getOrders()) {
+					if (order.getAttendees() != null) {
+						for (Attendee1 attendee : order.getAttendees()) {
+							// Payload includes cancelled and refunded orders, so skip those
+							if (Boolean.TRUE.equals(attendee.getCancelled()) || Boolean.TRUE.equals(attendee.getRefunded())) {
+								continue orders;
+							}
+							if (!orders.containsKey(order.getId())) {
+								orders.put(order.getId(), new ArrayList<>());
+							}
+							orders.get(order.getId()).add(attendee.getId());
+						}
+						tickets = tickets + 1;
+						if (order.getCosts() != null && order.getCosts().getBasePrice() != null) {
+							totalRaised = totalRaised.add(order.getCosts().getBasePrice().getValue());
+						}
+					}
+				}
+				totalRaised = totalRaised.divide(BigDecimal.valueOf(100L), 2, RoundingMode.HALF_UP);
+			}
+			logger.fine("sold " + tickets + ", raising " + totalRaised);
+			crowdfundingData.put("tickets", String.valueOf(tickets));
+			crowdfundingData.put("totalRaised", String.valueOf(totalRaised));
+		} catch (Exception e) {
+
+		}
+		return crowdfundingData;
 	}
 
 }
