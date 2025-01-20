@@ -435,7 +435,7 @@ public class BookingsService {
 		String subject = optionsDAO.findByName(confirmedPlayerSubject).getOptionValue();
 		String body = optionsDAO.findByName(confirmedPlayerBody).getOptionValue();
 
-		String defaultEventDateFormat = "EEEE, MMMM dd, YYYY";
+		String defaultEventDateFormat = "EEEE, MMMM dd, yyyy";
 		String defaultEventTimeFormat = "hh:mm aa";
 		SimpleDateFormat dateFormat = new SimpleDateFormat(defaultEventDateFormat);
 		SimpleDateFormat timeFormat = new SimpleDateFormat(defaultEventTimeFormat);
@@ -469,8 +469,11 @@ public class BookingsService {
 		String body = optionsDAO.findByName(confirmedHostBody).getOptionValue();
 		String month = new SimpleDateFormat("MMMM").format(event.getEventStartDate());
 		String day = new SimpleDateFormat("dd").format(event.getEventStartDate());
-		String year = new SimpleDateFormat("YYYY").format(event.getEventStartDate());
+		String year = new SimpleDateFormat("yyyy").format(event.getEventStartDate());
 		String time = new SimpleDateFormat("h:mm a").format(event.getEventStartTime());
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, MMMM dd, yyyy");
+		SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm aa");
 
 		String booked = takenSpaces.toString();
 		String remaining = new Integer(ticket.getTicketSpaces() - takenSpaces).toString();
@@ -478,7 +481,11 @@ public class BookingsService {
 
 		body = body.replaceAll("#_BOOKINGNAME", user.getDisplayName());
 		body = body.replaceAll("#_BOOKINGEMAIL", user.getUserEmail());
+		body = body.replaceAll("#_BOOKINGSUMMARY", "");
 		body = body.replaceAll("#_NAME", event.getEventName());
+		body = body.replaceAll("#_EVENTNAME", event.getEventName());
+		body = body.replaceAll("#_EVENTDATES", dateFormat.format(event.getEventStart()));
+		body = body.replaceAll("#_EVENTTIMES", timeFormat.format(event.getEventStart()));
 		body = body.replaceAll("#F", month);
 		body = body.replaceAll("#j", day);
 		body = body.replaceAll("#Y", year);

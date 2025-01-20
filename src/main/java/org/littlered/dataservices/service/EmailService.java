@@ -67,7 +67,8 @@ public class EmailService {
 			impl.send(mimeMessage);
 		} catch (Exception e ){
 			e.printStackTrace();
-			throw e;
+			// TODO have this complain to whatever Discord link we eventually create
+//			throw e;
 		}
 		logger.info("Done sending email.");
 
