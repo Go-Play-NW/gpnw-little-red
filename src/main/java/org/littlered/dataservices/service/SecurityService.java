@@ -67,10 +67,10 @@ public class SecurityService {
 	@Transactional
 	public void requestResetPasswordForUser(String emailAddress, String emailSubject, String emailBody) throws Exception {
 
-		checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
+//		checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
 		
 		List<Users> users = usersRepository.findByUserEmail(emailAddress);
-		if (users.size() == 0) {
+		if (users.isEmpty()) {
 			throw new Exception("No user found with that email!");
 		}
 		if (users.size() > 1) {
@@ -103,10 +103,10 @@ public class SecurityService {
 	@Transactional
 	public void performResetPasswordForUser(String emailAddress, String password, String uuid) throws Exception {
 
-		checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
+//		checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
 
 		List<Users> users = usersRepository.findByUserEmail(emailAddress);
-		if (users.size() == 0) {
+		if (users.isEmpty()) {
 			throw new Exception("No user found with that email!");
 		}
 		if (users.size() > 1) {
