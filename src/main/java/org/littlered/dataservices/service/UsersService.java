@@ -2,6 +2,7 @@ package org.littlered.dataservices.service;
 
 import org.littlered.dataservices.Constants;
 import org.littlered.dataservices.dto.wordpress.UsersDTO;
+import org.littlered.dataservices.entity.wordpress.Users;
 import org.littlered.dataservices.entity.wordpress.shrt.BbcUsersShort;
 import org.littlered.dataservices.repository.wordpress.interfaces.UsersRepositoryInterface;
 import org.littlered.dataservices.repository.wordpress.interfaces.UsersShortRepositoryInterface;
@@ -116,5 +117,15 @@ public class UsersService {
 			throw new Exception("No matching user for ID ".concat(userId.toString()).concat("!"));
 		}
 		return users.get(0);
+	}
+
+	public boolean isUserNameAvailable(String username) {
+		boolean available = true;
+		ArrayList<Users> users = usersRepository.findByUserLogin(username);
+		users.addAll(usersRepository.findByUserEmail(username));
+		if(!users.isEmpty()) {
+			available = false;
+		}
+		return available;
 	}
 }

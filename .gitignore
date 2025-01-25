@@ -25,3 +25,5 @@ nbdist/
 /application.properties
 /mvnw.cmd
 /mvnw
+/.jetclient/
+/src/main/resources/go-play-north-west-*.json

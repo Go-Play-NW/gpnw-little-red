@@ -312,7 +312,8 @@ public class EventsController {
 		return eventsService.getEventData(null);
 	}
 
-	@ApiOperation(value = "Data for volunteer schedule generation for the current year", response = EventScheduleDataDTO.class, responseContainer = "Iterable")
+
+	@ApiOperation(value = "Data for volunteer badge generation for the current year", response = EventScheduleDataDTO.class, responseContainer = "Iterable")
 	@RequestMapping(value = "/volunteerdata", method = RequestMethod.GET, produces = "application/json")
 	public Iterable<EventScheduleDataDTO> getVolunteerScheduleData() throws Exception {
 		return eventsService.getEventData("volunteer");
