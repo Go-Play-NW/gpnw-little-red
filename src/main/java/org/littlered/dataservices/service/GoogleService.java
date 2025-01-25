@@ -41,7 +41,7 @@ public class GoogleService {
 	public void updateGoogleSheet(List<List<Object>> writeData, String sheet) throws GeneralSecurityException, IOException {
 		final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 		Credentials googleCredentials;
-		File credentialsFile = new File("src/main/resources/" + this.credentialsFile);
+		File credentialsFile = new File(this.credentialsFile);
 		InputStream inputStream = Files.newInputStream(credentialsFile.toPath());
 		List<String> scopes = Collections.singletonList(SheetsScopes.SPREADSHEETS);
 		googleCredentials = GoogleCredentials.fromStream(inputStream).createScoped(scopes);
