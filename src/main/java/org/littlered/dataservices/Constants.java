@@ -66,4 +66,6 @@ public final class Constants {
 
 	public static final String DISCORD_ID_USERMETA_KEY = "discord_id";
 
+	public static final String EVENTBRITE_CROWDFUNDING_DATA = "eventbrite_crowdfunding_data";
+
 }

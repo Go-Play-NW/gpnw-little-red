@@ -67,6 +67,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers(HttpMethod.GET, "/events/**/spaces/public").permitAll()
 //				.antMatchers(HttpMethod.GET, "/events/eventmenus").permitAll()
 				.antMatchers(HttpMethod.PUT, "/users/create").permitAll()
+				.antMatchers("/payment/eventbrite/crowdfundingData").permitAll()
+				.antMatchers("/payment/eventbrite/updateCrowdfundingData").permitAll()
 				.anyRequest().authenticated()
 				.and()
 				// We filter the api/login requests

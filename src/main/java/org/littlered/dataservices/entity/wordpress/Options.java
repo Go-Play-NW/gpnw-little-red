@@ -13,6 +13,7 @@ public class Options {
 	private String autoload;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "option_id")
 	public Long getOptionId() {
 		return optionId;
