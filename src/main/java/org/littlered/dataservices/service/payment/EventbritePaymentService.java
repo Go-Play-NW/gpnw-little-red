@@ -82,6 +82,7 @@ public class EventbritePaymentService {
 		usersJPAService.createUserMeta(user, key, orderId);
 		usersJPAService.removeUserRole(user.getId(), Constants.ROLE_NOTATTENDING);
 		usersJPAService.addUserRole(user.getId(), Constants.ROLE_PAIDATTENDEE);
+		getCrowdfundingData();
 	}
 
 	public UsersDTO findUserByEventbriteOrderId(String orderId) throws Exception {
