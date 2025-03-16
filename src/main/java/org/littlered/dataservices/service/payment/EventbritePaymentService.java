@@ -132,6 +132,10 @@ public class EventbritePaymentService {
 				for (Order order : response.getOrders()) {
 					if (order.getAttendees() != null) {
 						for (Attendee1 attendee : order.getAttendees()) {
+							if(attendee.getTicketClassName() != null &&
+									!attendee.getTicketClassName().contains("Member")) {
+								continue;
+							}
 							// Payload includes cancelled and refunded orders, so skip those
 							if (Boolean.TRUE.equals(attendee.getCancelled()) || Boolean.TRUE.equals(attendee.getRefunded())) {
 								continue orders;
