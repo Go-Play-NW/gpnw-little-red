@@ -163,7 +163,8 @@ public class EventbriteTests {
 			System.out.println("\norder " + order.getId());
 				if (order.getAttendees() != null) {
 					for (Attendee1 attendee : order.getAttendees()) {
-						if(!attendee.getTicketClassName().contains("Member")) {
+						if(attendee.getTicketClassName() != null &&
+								!attendee.getTicketClassName().contains("Member")) {
 							continue;
 						}
 						// Payload includes cancelled and refunded orders, so skip those
