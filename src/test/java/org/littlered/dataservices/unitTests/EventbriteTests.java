@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import org.junit.Test;
 import org.littlered.dataservices.dto.wordpress.UsersDTO;
 import org.openapitools.client.api.AttendeeApi;
+import org.openapitools.client.api.EventApi;
 import org.openapitools.client.api.OrderApi;
 import org.openapitools.client.api.QuestionsApi;
 import org.openapitools.client.auth.HttpBearerAuth;
@@ -30,7 +31,7 @@ import java.util.logging.Logger;
 
 public class EventbriteTests {
 
-	private String eventID = "866992236117";
+	private String eventID = "1048354164527";
 	private String apiKey = "XDAPRWGTYCXDSNF723";
 	private String eventbritePrivateToken = "IFNRDYFWDM7J3RPNUQPK";
 	private String questionId = "106450539";
@@ -149,7 +150,7 @@ public class EventbriteTests {
 
 
 		ListOrdersbyEventIDresponse response = orderApi.listOrdersbyEventID(eventID, null, null, null, null,
-				null, null, "attendees");
+				null, null, "attendees,merchandise");
 
 		HashMap<String, ArrayList<String>> orders = new HashMap<>();
 
@@ -162,6 +163,10 @@ public class EventbriteTests {
 			System.out.println("\norder " + order.getId());
 				if (order.getAttendees() != null) {
 					for (Attendee1 attendee : order.getAttendees()) {
+						if(attendee.getTicketClassName() != null &&
+								!attendee.getTicketClassName().contains("Member")) {
+							continue;
+						}
 						// Payload includes cancelled and refunded orders, so skip those
 						ArrayList<String> statuses = new ArrayList<>();
 						boolean skip = false;
@@ -183,8 +188,8 @@ public class EventbriteTests {
 							orders.put(order.getId(), new ArrayList<>());
 						}
 						orders.get(order.getId()).add(attendee.getId());
+						tickets = tickets + 1;
 					}
-					tickets = tickets + 1;
 					if (order.getCosts() != null && order.getCosts().getBasePrice() != null) {
 						totalRaised = totalRaised.add(order.getCosts().getBasePrice().getValue());
 //						logger.info(order.getId() + "\t" + order.getEmail() + "\t" + order.getCosts().getBasePrice().getValue());

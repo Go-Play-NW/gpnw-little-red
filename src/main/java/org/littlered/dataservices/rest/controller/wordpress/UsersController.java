@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
@@ -185,6 +186,18 @@ public class UsersController {
 			usersJPAService.create(createUser);
 		} catch (UniqueUserException uue) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
+	}
+
+	@RequestMapping(value = "/isUserNameAvailable/{username}", method = RequestMethod.GET)
+	public void isUserNameAvailable(
+			@PathVariable(value="username")String userName, HttpServletRequest request,
+			HttpServletResponse response) {
+		boolean available = usersService.isUserNameAvailable(userName);
+		if(available) {
+			response.setStatus(HttpServletResponse.SC_OK);
+		} else {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		}
 	}
 

@@ -49,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable().authorizeRequests()
+		http.cors().and().csrf().disable().authorizeRequests()
 				// opening access for swagger api documentation
 				.antMatchers("/webjars/**").permitAll()
 				.antMatchers("/swagger-resources/**").permitAll()
@@ -60,13 +60,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers(HttpMethod.POST, "/login").permitAll()
 				.antMatchers(HttpMethod.POST, "/password/request").permitAll()
 				.antMatchers(HttpMethod.POST, "/password/reset").permitAll()
-				//.antMatchers(HttpMethod.POST, "/refreshtoken").permitAll()
+				.antMatchers(HttpMethod.GET, "/isUserNameAvailable/**").permitAll()
 				.antMatchers(HttpMethod.GET, "/events/all/public").permitAll()
 				.antMatchers(HttpMethod.GET, "/events/page/public/**").permitAll()
 				.antMatchers(HttpMethod.GET, "/events/spaces/public").permitAll()
 				.antMatchers(HttpMethod.GET, "/events/**/spaces/public").permitAll()
-				.antMatchers(HttpMethod.GET, "/events/eventmenus").permitAll()
+//				.antMatchers(HttpMethod.GET, "/events/eventmenus").permitAll()
 				.antMatchers(HttpMethod.PUT, "/users/create").permitAll()
+				.antMatchers("/payment/eventbrite/crowdfundingData").permitAll()
+				.antMatchers("/payment/eventbrite/updateCrowdfundingData").permitAll()
 				.anyRequest().authenticated()
 				.and()
 				// We filter the api/login requests

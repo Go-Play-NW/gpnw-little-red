@@ -3,8 +3,10 @@ package org.littlered.dataservices.service.payment;
 import org.apache.commons.lang3.StringUtils;
 import org.littlered.dataservices.Constants;
 import org.littlered.dataservices.dto.wordpress.UsersDTO;
+import org.littlered.dataservices.entity.wordpress.Options;
 import org.littlered.dataservices.entity.wordpress.Usermeta;
 import org.littlered.dataservices.entity.wordpress.Users;
+import org.littlered.dataservices.repository.eventManager.interfaces.OptionsRepositoryInterface;
 import org.littlered.dataservices.repository.wordpress.interfaces.UsermetaJPAInterface;
 import org.littlered.dataservices.repository.wordpress.interfaces.UsersJPAInterface;
 import org.littlered.dataservices.repository.wordpress.interfaces.UsersRepositoryInterface;
@@ -26,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static org.littlered.dataservices.Constants.EVENTBRITE_CROWDFUNDING_DATA;
+
 @Service
 public class EventbritePaymentService {
 
@@ -39,6 +43,9 @@ public class EventbritePaymentService {
 
 	@Autowired
 	private UsersRepositoryInterface usersRepositoryInterface;
+
+	@Autowired
+	private OptionsRepositoryInterface optionsRepositoryInterface;
 
 	@Value("${eventbrite.api.key}")
 	private String eventbriteApiKey;
@@ -75,6 +82,7 @@ public class EventbritePaymentService {
 		usersJPAService.createUserMeta(user, key, orderId);
 		usersJPAService.removeUserRole(user.getId(), Constants.ROLE_NOTATTENDING);
 		usersJPAService.addUserRole(user.getId(), Constants.ROLE_PAIDATTENDEE);
+		getCrowdfundingData();
 	}
 
 	public UsersDTO findUserByEventbriteOrderId(String orderId) throws Exception {
@@ -124,6 +132,10 @@ public class EventbritePaymentService {
 				for (Order order : response.getOrders()) {
 					if (order.getAttendees() != null) {
 						for (Attendee1 attendee : order.getAttendees()) {
+							if(attendee.getTicketClassName() != null &&
+									!attendee.getTicketClassName().contains("Member")) {
+								continue;
+							}
 							// Payload includes cancelled and refunded orders, so skip those
 							if (Boolean.TRUE.equals(attendee.getCancelled()) || Boolean.TRUE.equals(attendee.getRefunded())) {
 								continue orders;
@@ -147,7 +159,37 @@ public class EventbritePaymentService {
 		} catch (Exception e) {
 
 		}
+		cacheCrowdfundingData(crowdfundingData);
 		return crowdfundingData;
 	}
 
+	public void cacheCrowdfundingData(HashMap<String, String> crowdfundingData) {
+		String crowdfundingDataCache = crowdfundingData.get("tickets") +
+				"|" + crowdfundingData.get("totalRaised");
+		Options crowdFundingOptions = optionsRepositoryInterface.findByName(EVENTBRITE_CROWDFUNDING_DATA);
+		if (crowdFundingOptions == null) {
+			crowdFundingOptions = new Options();
+			crowdFundingOptions.setAutoload("yes");
+			crowdFundingOptions.setOptionName(EVENTBRITE_CROWDFUNDING_DATA);
+			crowdFundingOptions.setOptionValue(crowdfundingDataCache);
+		} else {
+			crowdFundingOptions.setOptionValue(crowdfundingDataCache);
+		}
+
+		optionsRepositoryInterface.save(crowdFundingOptions);
+	}
+
+	public HashMap<String, String> getCrowdfundingDataCache() {
+		HashMap<String, String> crowdfundingData = new HashMap<>();
+		Options crowdfundingDataCache = optionsRepositoryInterface.findByName(EVENTBRITE_CROWDFUNDING_DATA);
+		if (crowdfundingDataCache == null) {
+			crowdfundingData.put("tickets", String.valueOf(0));
+			crowdfundingData.put("totalRaised", String.valueOf(0));
+		} else {
+			String[] data = crowdfundingDataCache.getOptionValue().split("\\|");
+			crowdfundingData.put("tickets", data[0]);
+			crowdfundingData.put("totalRaised", data[1]);
+		}
+		return crowdfundingData;
+	}
 }

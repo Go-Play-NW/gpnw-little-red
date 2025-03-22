@@ -69,6 +69,12 @@ public class EventbritePaymentController {
 	@ApiOperation(value = "", response = HashMap.class)
 	@RequestMapping(value = "/crowdfundingData", method = RequestMethod.GET)
 	public HashMap<String, String> crowdfundingData() {
+		return eventbritePaymentService.getCrowdfundingDataCache();
+	}
+
+	@ApiOperation(value = "", response = HashMap.class)
+	@RequestMapping(value = "/updateCrowdfundingData", method = RequestMethod.GET)
+	public HashMap<String, String> updateCrowdfundingData() {
 		return eventbritePaymentService.getCrowdfundingData();
 	}
 
