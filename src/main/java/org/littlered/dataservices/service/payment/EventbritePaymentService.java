@@ -144,8 +144,8 @@ public class EventbritePaymentService {
 								orders.put(order.getId(), new ArrayList<>());
 							}
 							orders.get(order.getId()).add(attendee.getId());
+							tickets = tickets + 1;
 						}
-						tickets = tickets + 1;
 						if (order.getCosts() != null && order.getCosts().getBasePrice() != null) {
 							totalRaised = totalRaised.add(order.getCosts().getBasePrice().getValue());
 						}
