@@ -11798,6 +11798,16 @@
             }
           },
           {
+            "name": "page",
+            "in": "query",
+            "description": "Data page.",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "last_item_seen",
             "in": "query",
             "description": "Orders changed on or after this time, and with an ID larger than last item seen.",
