@@ -12,9 +12,7 @@ import org.json.JSONObject;
 import org.junit.Test;
 import org.littlered.dataservices.dto.wordpress.UsersDTO;
 import org.openapitools.client.api.AttendeeApi;
-import org.openapitools.client.api.EventApi;
 import org.openapitools.client.api.OrderApi;
-import org.openapitools.client.api.QuestionsApi;
 import org.openapitools.client.auth.HttpBearerAuth;
 import org.openapitools.client.model.*;
 
@@ -22,8 +20,9 @@ import org.openapitools.client.model.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -148,8 +147,11 @@ public class EventbriteTests {
 		attendeeAuth.setBearerToken(eventbritePrivateToken);
 		attendeeApi.getApiClient().setDebugging(false);
 
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'z'");
+		Date now = new Date(0);
+		String date = dateFormat.format(now);
 
-		ListOrdersbyEventIDresponse response = orderApi.listOrdersbyEventID(eventID, null, null, null, null,
+		ListOrdersbyEventIDresponse response = orderApi.listOrdersbyEventID(eventID, null, date, null, null,
 				null, null, "attendees,merchandise");
 
 		HashMap<String, ArrayList<String>> orders = new HashMap<>();

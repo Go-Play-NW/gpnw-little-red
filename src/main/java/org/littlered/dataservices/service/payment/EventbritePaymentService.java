@@ -23,7 +23,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
@@ -56,6 +59,7 @@ public class EventbritePaymentService {
 	@Value("${eventbrite.private.token}")
 	private String eventbritePrivateToken;
 
+	private SimpleDateFormat ebDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'z'");
 
 	public void receiveEventbriteUserToken(Users user, String code ) throws Exception {
 
@@ -120,7 +124,10 @@ public class EventbritePaymentService {
 		attendeeApi.getApiClient().setDebugging(false);
 
 		try {
-			ListOrdersbyEventIDresponse response = orderApi.listOrdersbyEventID(eventbriteEventId, null, null, null, null,
+			Date now = new Date(0);
+			String beginningOfTime = ebDateFormat.format(now);
+
+			ListOrdersbyEventIDresponse response = orderApi.listOrdersbyEventID(eventbriteEventId, null, beginningOfTime, null, null,
 					null, null, "attendees");
 
 			HashMap<String, ArrayList<String>> orders = new HashMap<>();
