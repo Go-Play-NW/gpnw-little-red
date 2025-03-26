@@ -11,6 +11,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.littlered.dataservices.dto.wordpress.UsersDTO;
+import org.openapitools.client.ApiException;
 import org.openapitools.client.api.AttendeeApi;
 import org.openapitools.client.api.OrderApi;
 import org.openapitools.client.auth.HttpBearerAuth;
@@ -20,10 +21,12 @@ import org.openapitools.client.model.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Logger;
@@ -54,7 +57,7 @@ public class EventbriteTests {
 		attendeeApi.getApiClient().setDebugging(true);
 
 
-		ListOrdersbyEventIDresponse response = orderApi.listOrdersbyEventID(eventID, null, null, null,  null,
+		ListOrdersbyEventIDresponse response = orderApi.listOrdersbyEventID(eventID, null, null, "1", null,  null,
 				null, null, "attendees");
 
 		HashMap<String, String> discordIds = new HashMap<>();
@@ -147,59 +150,66 @@ public class EventbriteTests {
 		attendeeAuth.setBearerToken(eventbritePrivateToken);
 		attendeeApi.getApiClient().setDebugging(false);
 
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'z'");
-		Date now = new Date(0);
-		String date = dateFormat.format(now);
-
-		ListOrdersbyEventIDresponse response = orderApi.listOrdersbyEventID(eventID, null, date, null, null,
-				null, null, "attendees,merchandise");
-
-		HashMap<String, ArrayList<String>> orders = new HashMap<>();
-
+		boolean done = false;
 		int tickets = 0;
 		BigDecimal totalRaised = BigDecimal.ZERO;
-		if(response.getOrders() != null) {
-			orders:
-			for (Order order : response.getOrders()) {
+		int page = 1;
+
+		while (!done) {
+			try {
+				System.out.println("Page:" + page);
+				ListOrdersbyEventIDresponse response = orderApi.listOrdersbyEventID(eventID, null, null, Integer.toString(page), null, null, null, null, "attendees,merchandise");
+
+				HashMap<String, ArrayList<String>> orders = new HashMap<>();
+
+				if (response.getOrders() != null) {
+					orders:
+					for (Order order : response.getOrders()) {
 //			Order fullOrder = orderApi.retrieveOrderbyID(order.getId());
-			System.out.println("\norder " + order.getId());
-				if (order.getAttendees() != null) {
-					for (Attendee1 attendee : order.getAttendees()) {
-						if(attendee.getTicketClassName() != null &&
-								!attendee.getTicketClassName().contains("Member")) {
-							continue;
-						}
-						// Payload includes cancelled and refunded orders, so skip those
-						ArrayList<String> statuses = new ArrayList<>();
-						boolean skip = false;
-						if (Boolean.TRUE.equals(attendee.getCancelled())) {
-							statuses.add("cancelled");
-							skip = true;
-						}
-						if (Boolean.TRUE.equals(attendee.getRefunded())) {
-							statuses.add("refunded");
-							skip = true;
-						}
-						if (skip) {
-							System.out.println("\t" + StringUtils.join(statuses, ",") + " " + attendee.getId() + " " + order.getEmail());
-							continue orders;
-						} else {
-							System.out.println("\tattendee" + " " + attendee.getId() + " " + order.getEmail());
-						}
-						if (!orders.containsKey(order.getId())) {
-							orders.put(order.getId(), new ArrayList<>());
-						}
-						orders.get(order.getId()).add(attendee.getId());
-						tickets = tickets + 1;
-					}
-					if (order.getCosts() != null && order.getCosts().getBasePrice() != null) {
-						totalRaised = totalRaised.add(order.getCosts().getBasePrice().getValue());
+						System.out.println("\norder " + order.getId());
+						if (order.getAttendees() != null) {
+							for (Attendee1 attendee : order.getAttendees()) {
+								if (attendee.getTicketClassName() != null &&
+										!attendee.getTicketClassName().contains("Member")) {
+									continue;
+								}
+								// Payload includes cancelled and refunded orders, so skip those
+								ArrayList<String> statuses = new ArrayList<>();
+								boolean skip = false;
+								if (Boolean.TRUE.equals(attendee.getCancelled())) {
+									statuses.add("cancelled");
+									skip = true;
+								}
+								if (Boolean.TRUE.equals(attendee.getRefunded())) {
+									statuses.add("refunded");
+									skip = true;
+								}
+								if (skip) {
+									System.out.println("\t" + StringUtils.join(statuses, ",") + " " + attendee.getId() + " " + order.getEmail());
+									continue orders;
+								} else {
+									System.out.println("\tattendee" + " " + attendee.getId() + " " + order.getEmail());
+								}
+								if (!orders.containsKey(order.getId())) {
+									orders.put(order.getId(), new ArrayList<>());
+								}
+								orders.get(order.getId()).add(attendee.getId());
+								tickets = tickets + 1;
+							}
+							if (order.getCosts() != null && order.getCosts().getBasePrice() != null) {
+								totalRaised = totalRaised.add(order.getCosts().getBasePrice().getValue());
 //						logger.info(order.getId() + "\t" + order.getEmail() + "\t" + order.getCosts().getBasePrice().getValue());
+							}
+						}
 					}
+					page++;
 				}
+			} catch(ApiException ae){
+				System.out.println(ae.getResponseBody());
+				done = true;
 			}
-			totalRaised = totalRaised.divide(BigDecimal.valueOf(100L), 2, RoundingMode.HALF_UP);
 		}
+		totalRaised = totalRaised.divide(BigDecimal.valueOf(100L), 2, RoundingMode.HALF_UP);
 		logger.info("sold " + tickets + ", raising " + totalRaised);
 
 	}
