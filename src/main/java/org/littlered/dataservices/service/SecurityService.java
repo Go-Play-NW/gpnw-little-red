@@ -36,8 +36,11 @@ public class SecurityService {
 	@Autowired
 	private EmailService emailService;
 
-	@Value("${db.table_prefix}")
-	private String tablePrefix;
+    @Value("${db.table_prefix}")
+    private String tablePrefix;
+
+    @Value("${site.baseUri}")
+	private String baseUri;
 
 	public void checkRolesForCurrentUser(List<String> authorizedRoles) throws Exception {
 		Users user = usersService.getCurrentUser();
@@ -83,6 +86,10 @@ public class SecurityService {
 
 		emailBody = emailBody.replaceAll("\\[emailAddress\\]", emailAddress);
 		emailBody = emailBody.replaceAll("\\[uuid\\]", uuid);
+
+        if(baseUri.contains("dev.goplaynw.org")) {
+            logger.info(user.getUserEmail() + " " + uuid);
+        }
 
 		user.setUserActivationKey(hashActivationKey(uuid));
 		usersRepository.save(user);
