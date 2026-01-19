@@ -99,7 +99,7 @@ public class SecurityService {
 			HashMap<String, String> resetEmail = new HashMap<>();
 			resetEmail.put("subject", emailSubject);
 			resetEmail.put("body", emailBody);
-			resetEmail.put("to", emailAddress);
+			resetEmail.put("to", user.getUserEmail());
 			emailService.sendEmail(resetEmail);
 		} catch (Exception e) {
 			logger.severe("Error sending email for password reset for " + emailAddress + "!");
