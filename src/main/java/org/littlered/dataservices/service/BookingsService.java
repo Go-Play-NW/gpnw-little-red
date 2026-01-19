@@ -78,6 +78,9 @@ public class BookingsService {
 	@Value("${email.signature}")
 	private String emailSignature;
 
+    @Value("${event.ticketed}")
+    private Boolean eventTicketed;
+
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private static final String pendingPlayerSubject = "dbem_bookings_email_pending_subject";
@@ -129,7 +132,9 @@ public class BookingsService {
 
 		// Does the user have a badge?
 		try {
-			securityService.checkRolesForUser(user, Constants.ROLE_LIST_HAS_BADGE);
+            if (eventTicketed) {
+                securityService.checkRolesForUser(user, Constants.ROLE_LIST_HAS_BADGE);
+            }
 		} catch (Exception e) {
 			logger.info("User " + user.getDisplayName() + " does not have a role indicating a badge.");
 			bookingsService.stateTable.put(uuid, Constants.MESSAGE_NO_BADGE_ROLE);
