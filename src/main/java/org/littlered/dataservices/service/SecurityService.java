@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigInteger;
+import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +73,7 @@ public class SecurityService {
 
 //		checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
 		
-		List<Users> users = usersRepository.findByUserEmail(emailAddress);
+		List<Users> users = usersRepository.findByUserEmail(URLDecoder.decode(emailAddress, "UTF-8"));
 		if (users.isEmpty()) {
 			throw new Exception("No user found with that email!");
 		}
@@ -112,7 +113,7 @@ public class SecurityService {
 
 //		checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
 
-		List<Users> users = usersRepository.findByUserEmail(emailAddress);
+		List<Users> users = usersRepository.findByUserEmail(URLDecoder.decode(emailAddress,"UTF-8"));
 		if (users.isEmpty()) {
 			throw new Exception("No user found with that email!");
 		}
