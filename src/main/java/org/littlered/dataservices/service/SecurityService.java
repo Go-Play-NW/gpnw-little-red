@@ -71,9 +71,11 @@ public class SecurityService {
 	@Transactional
 	public void requestResetPasswordForUser(String emailAddress, String emailSubject, String emailBody) throws Exception {
 
-//		checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
-		
-		List<Users> users = usersRepository.findByUserEmail(URLDecoder.decode(emailAddress, "UTF-8"));
+        emailAddress = URLDecoder.decode(emailAddress, "UTF-8");
+        emailSubject = URLDecoder.decode(emailSubject, "UTF-8");
+        emailBody = URLDecoder.decode(emailBody, "UTF-8");
+
+		List<Users> users = usersRepository.findByUserEmail(emailAddress);
 		if (users.isEmpty()) {
 			throw new Exception("No user found with that email!");
 		}
@@ -111,7 +113,9 @@ public class SecurityService {
 	@Transactional
 	public void performResetPasswordForUser(String emailAddress, String password, String uuid) throws Exception {
 
-//		checkRolesForCurrentUser(Constants.ROLE_LIST_ADMIN_ONLY);
+        emailAddress = URLDecoder.decode(emailAddress, "UTF-8");
+        password = URLDecoder.decode(password, "UTF-8");
+        uuid = URLDecoder.decode(uuid, "UTF-8");
 
 		List<Users> users = usersRepository.findByUserEmail(URLDecoder.decode(emailAddress,"UTF-8"));
 		if (users.isEmpty()) {

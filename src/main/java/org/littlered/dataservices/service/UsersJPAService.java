@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
@@ -49,8 +50,21 @@ public class UsersJPAService {
 
 		Date now = Calendar.getInstance().getTime();
 
-		List<Users> loginCheck = usersRepository.findUsersByUserLogin(userIn.getUserLogin());
-		if (loginCheck != null && loginCheck.size() > 0) {
+        String userLogin = URLDecoder.decode(userIn.getUserLogin(), "UTF-8");
+		String userPass = URLDecoder.decode(userIn.getUserPass(), "UTF-8");
+		String userNicename = URLDecoder.decode(userIn.getUserNicename(), "UTF-8");
+		String userEmail = URLDecoder.decode(userIn.getUserEmail(), "UTF-8");
+		String userUrl = URLDecoder.decode(userIn.getUserUrl(), "UTF-8");
+		String displayName = URLDecoder.decode(userIn.getDisplayName(), "UTF-8");
+        String firstName = URLDecoder.decode(userIn.getFirstName(), "UTF-8");
+        String lastName = URLDecoder.decode(userIn.getLastName(), "UTF-8");
+        String nickname = URLDecoder.decode(userIn.getNickname(), "UTF-8");
+        String emailSubject = URLDecoder.decode(userIn.getEmailSubject(), "UTF-8");
+        String emailBody = URLDecoder.decode(userIn.getEmailBody(), "UTF-8");
+
+
+        List<Users> loginCheck = usersRepository.findUsersByUserLogin(userIn.getUserLogin());
+		if (loginCheck != null && !loginCheck.isEmpty()) {
 			HashMap<String, String> badLogiMail = new HashMap<>();
 			badLogiMail.put("subject", "Account Creation Failed at Go Play NW");
 			badLogiMail.put("body", "Someone just tried to create a user account at Go Play NW with the user name associated with this email address. " +
@@ -63,7 +77,7 @@ public class UsersJPAService {
 		}
 
 		List<Users> emailCheck = usersRepository.findUsersByUserEmail(userIn.getUserEmail());
-		if (emailCheck != null && emailCheck.size() > 0) {
+		if (emailCheck != null && !emailCheck.isEmpty()) {
 			HashMap<String, String> badEmailMail = new HashMap<>();
 			badEmailMail.put("subject", "Account Creation Failed at Go Play NW");
 			badEmailMail.put("body", "Someone just tried to create a user account at Go Play NW with this email address. " +
@@ -76,34 +90,34 @@ public class UsersJPAService {
 		}
 
 		Users user = new Users();
-		user.setUserLogin(userIn.getUserLogin());
-		user.setUserPass(new PhpPasswordEncoder().encode(userIn.getUserPass()));
-		user.setUserNicename(userIn.getUserNicename());
-		user.setUserEmail(userIn.getUserEmail());
-		user.setUserUrl(userIn.getUserUrl());
+		user.setUserLogin(userLogin);
+		user.setUserPass(new PhpPasswordEncoder().encode(userPass));
+		user.setUserNicename(userNicename);
+		user.setUserEmail(userEmail);
+		user.setUserUrl(userUrl);
 		user.setUserStatus(0);
 		user.setUserActivationKey("");
 		user.setUserRegistered(new Timestamp(now.getTime()));
-		user.setDisplayName(userIn.getDisplayName());
+		user.setDisplayName(displayName);
 
 		usersRepository.saveAndFlush(user);
 
 		Usermeta usermeta = new Usermeta();
 		usermeta.setUserId(user.getId());
 		usermeta.setMetaKey("first_name");
-		usermeta.setMetaValue(userIn.getFirstName());
+		usermeta.setMetaValue(firstName);
 		usermetaJPAInterface.save(usermeta);
 
 		usermeta = new Usermeta();
 		usermeta.setUserId(user.getId());
 		usermeta.setMetaKey("last_name");
-		usermeta.setMetaValue(userIn.getLastName());
+		usermeta.setMetaValue(lastName);
 		usermetaJPAInterface.save(usermeta);
 
 		usermeta = new Usermeta();
 		usermeta.setUserId(user.getId());
 		usermeta.setMetaKey("nickname");
-		usermeta.setMetaValue(userIn.getNickname());
+		usermeta.setMetaValue(nickname);
 		usermetaJPAInterface.save(usermeta);
 
 		usermeta = new Usermeta();
@@ -116,13 +130,13 @@ public class UsersJPAService {
 
 		try {
 			HashMap<String, String> newUserMail = new HashMap<>();
-			newUserMail.put("subject", userIn.getEmailSubject());
-			newUserMail.put("body", userIn.getEmailBody());
-			newUserMail.put("to", userIn.getUserEmail());
+			newUserMail.put("subject", emailSubject);
+			newUserMail.put("body", emailBody);
+			newUserMail.put("to", userEmail);
 			emailService.sendEmail(newUserMail);
-			logger.info("Sent email for created account to " + userIn.getUserLogin());
+			logger.info("Sent email for created account to " + userLogin);
 		} catch (Exception e) {
-			logger.severe("Error sending email for password reset for " + userIn.getUserEmail() + "!");
+			logger.severe("Error sending email for password reset for " + userEmail + "!");
 			e.printStackTrace();
 		}
 
