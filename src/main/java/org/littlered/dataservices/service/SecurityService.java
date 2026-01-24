@@ -117,7 +117,7 @@ public class SecurityService {
         password = URLDecoder.decode(password, "UTF-8");
         uuid = URLDecoder.decode(uuid, "UTF-8");
 
-		List<Users> users = usersRepository.findByUserEmail(URLDecoder.decode(emailAddress,"UTF-8"));
+		List<Users> users = usersRepository.findByUserEmail(emailAddress);
 		if (users.isEmpty()) {
 			throw new Exception("No user found with that email!");
 		}
